@@ -1,0 +1,11 @@
+{
+  "name": "@edgemirror/dashboard",
+  "private": true,
+  "version": "0.1.0",
+  "description": "EdgeMirror dashboard visual shell — design-system consistency",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "npx --yes serve public -p 4173"
+  },
+  "license": "Apache-2.0"
+}
