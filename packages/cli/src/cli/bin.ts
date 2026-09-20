@@ -14,6 +14,7 @@ import {
   registerDemoCommand,
   registerPitchDemoCommand,
 } from "./commands/demo.js";
+import { registerCloudCommand } from "./commands/cloud.js";
 import { runDefaultAction } from "./onboarding.js";
 import { formatError } from "./ux.js";
 
@@ -43,6 +44,7 @@ ${pc.bold("Examples")}
   edgemirror pitch-demo      # live local + optional Cloudflare preview (<5 min)
   edgemirror demo cloudflare # same as pitch-demo
   edgemirror demo reset      # ownership-safe Cloudflare cleanup
+  edgemirror cloud billing   # Cloud billing status (requires API; OSS CLI stays free)
   edgemirror test --local
   edgemirror preview
   edgemirror compat --dates 2024-11-11,2025-04-01
@@ -63,6 +65,7 @@ registerBundleCommand(program);
 registerDeployCommand(program);
 registerDemoCommand(program);
 registerPitchDemoCommand(program);
+registerCloudCommand(program);
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -79,6 +82,7 @@ async function main(): Promise<void> {
     "deploy",
     "demo",
     "pitch-demo",
+    "cloud",
     "help",
   ]);
   const first = argv.find((a) => !a.startsWith("-"));
