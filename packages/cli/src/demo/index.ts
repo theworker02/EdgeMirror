@@ -190,6 +190,7 @@ export async function runDemo(options: DemoOptions = {}): Promise<DemoResult> {
     remoteStatus: "configured",
     remoteReason:
       "DEMO synthesized remote (not live Cloudflare) — for illustration only",
+    demo: true,
     checks: [
       {
         id: "demo",
@@ -219,7 +220,7 @@ This evidence is **DEMO-only**.
 
   if (!options.quiet) {
     console.log("");
-    console.log(pc.bold(pc.magenta("═══ EdgeMirror DEMO ═══")));
+    console.log(pc.bold(pc.magenta("EdgeMirror DEMO")));
     console.log(
       pc.magenta(
         "Isolated temp Worker — findings labeled DEMO — never mixed with real corpus.",
@@ -232,7 +233,7 @@ This evidence is **DEMO-only**.
     console.log("");
     console.log(
       pc.magenta(
-        "DEMO complete. This was an intentional controlled divergence for illustration.",
+        "DEMO complete. Intentional controlled divergence for illustration only.",
       ),
     );
     if (!options.keep) {

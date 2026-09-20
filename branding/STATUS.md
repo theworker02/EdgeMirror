@@ -21,7 +21,8 @@ Technical parity classifications remain visible alongside these labels.
 |----------------|----------------|-------|
 | `MATCH` | `VERIFIED` | Keep classification in evidence |
 | `EXPECTED_DIFFERENCE` | `VERIFIED` | Annotate as expected |
-| `UNEXPECTED_DIFFERENCE` | `DIVERGENT` | Primary finding state |
+| `POSSIBLE_RUNTIME_DIVERGENCE` | `DIVERGENT` | Primary finding state |
+| `RUNTIME_DIVERGENCE` | `DIVERGENT` | Confirmed divergence |
 | `REMOTE_NOT_CONFIGURED` | `BLOCKED` | Never fabricate remote |
 | `INSUFFICIENT_EVIDENCE` | `UNKNOWN` | Exit code 3 territory |
 | `CONFIGURATION_DIFFERENCE` | `DIVERGENT` | Or `BLOCKED` if unrunnable |

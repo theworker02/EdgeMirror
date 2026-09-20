@@ -24,16 +24,25 @@ export function registerDoctorCommand(program: Command): void {
         const zc = discoverZeroConfig(project.projectRoot);
         console.log("");
         console.log("Zero-config extras");
+        const kv = (label: string, value: string, width = 24): string => {
+          const dots = ".".repeat(Math.max(2, width - label.length));
+          return `  ${label} ${dots} ${value}`;
+        };
         console.log(
-          `  Vitest ................. ${zc.vitest.detected ? (zc.vitest.cloudflarePool ? "detected (CF pool)" : "detected") : "not found"}`,
+          kv(
+            "Vitest",
+            zc.vitest.detected
+              ? zc.vitest.cloudflarePool
+                ? "detected (CF pool)"
+                : "detected"
+              : "not found",
+          ),
         );
+        console.log(kv("Vite", zc.vite.detected ? "detected" : "not found"));
         console.log(
-          `  Vite ................... ${zc.vite.detected ? "detected" : "not found"}`,
+          kv("TypeScript", zc.typescript.detected ? "detected" : "not found"),
         );
-        console.log(
-          `  TypeScript ............. ${zc.typescript.detected ? "detected" : "not found"}`,
-        );
-        console.log(`  package manager ........ ${zc.packageManager}`);
+        console.log(kv("package manager", zc.packageManager));
       } catch (err) {
         if (err instanceof EdgeMirrorDiscoveryError) {
           console.error(err.message);

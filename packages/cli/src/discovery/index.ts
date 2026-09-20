@@ -304,52 +304,49 @@ export function formatDoctorReport(
   fingerprint: EnvironmentFingerprint,
   verbose = false,
 ): string {
+  // Inline formatting keeps discovery free of CLI UX imports (avoid cycles).
+  const kv = (label: string, value: string, width = 24): string => {
+    const dots = ".".repeat(Math.max(2, width - label.length));
+    return `  ${label} ${dots} ${value}`;
+  };
   const lines: string[] = [];
   lines.push(`EdgeMirror ${fingerprint.edgemirrorVersion}`);
   lines.push("");
   lines.push("Project");
-  lines.push(
-    `  Cloudflare Worker ...... ${fingerprint.workerName ?? "detected"}`,
-  );
+  lines.push(kv("Cloudflare Worker", fingerprint.workerName ?? "detected"));
   if (fingerprint.entryPoint) {
-    lines.push(`  entry point ............ ${fingerprint.entryPoint}`);
+    lines.push(kv("entry point", fingerprint.entryPoint));
   }
   if (fingerprint.wranglerConfigPath) {
-    lines.push(`  wrangler config ........ ${fingerprint.wranglerConfigPath}`);
+    lines.push(kv("wrangler config", fingerprint.wranglerConfigPath));
   }
   lines.push("");
   lines.push("Local runtime");
   lines.push(
-    `  workerd ................ ${fingerprint.runtime === "workerd" ? "detected" : "not found"}`,
+    kv("workerd", fingerprint.runtime === "workerd" ? "detected" : "not found"),
   );
-  lines.push(
-    `  Wrangler ............... ${fingerprint.wrangler ?? "not found"}`,
-  );
-  lines.push(`  Node.js ................ ${fingerprint.node}`);
-  lines.push(
-    `  package manager ........ ${fingerprint.packageManager ?? "unknown"}`,
-  );
-  lines.push(
-    `  compatibility date ..... ${fingerprint.compatibilityDate ?? "unset"}`,
-  );
+  lines.push(kv("Wrangler", fingerprint.wrangler ?? "not found"));
+  lines.push(kv("Node.js", fingerprint.node));
+  lines.push(kv("package manager", fingerprint.packageManager ?? "unknown"));
+  lines.push(kv("compatibility date", fingerprint.compatibilityDate ?? "unset"));
   if (fingerprint.compatibilityFlags.length) {
     lines.push(
-      `  compatibility flags .... ${fingerprint.compatibilityFlags.join(", ")}`,
+      kv("compatibility flags", fingerprint.compatibilityFlags.join(", ")),
     );
   }
   lines.push("");
   lines.push("Bindings");
   const b = fingerprint.bindings;
-  lines.push(`  KV ..................... ${b.kv}`);
-  lines.push(`  D1 ..................... ${b.d1}`);
-  lines.push(`  R2 ..................... ${b.r2}`);
-  lines.push(`  Durable Objects ........ ${b.durableObjects}`);
-  lines.push(`  Queues ................. ${b.queues}`);
-  lines.push(`  Service bindings ....... ${b.serviceBindings}`);
-  lines.push(`  Workflows .............. ${b.workflows}`);
-  lines.push(`  Hyperdrive ............. ${b.hyperdrive}`);
-  lines.push(`  Vectorize .............. ${b.vectorize}`);
-  lines.push(`  Workers AI ............. ${b.ai}`);
+  lines.push(kv("KV", String(b.kv)));
+  lines.push(kv("D1", String(b.d1)));
+  lines.push(kv("R2", String(b.r2)));
+  lines.push(kv("Durable Objects", String(b.durableObjects)));
+  lines.push(kv("Queues", String(b.queues)));
+  lines.push(kv("Service bindings", String(b.serviceBindings)));
+  lines.push(kv("Workflows", String(b.workflows)));
+  lines.push(kv("Hyperdrive", String(b.hyperdrive)));
+  lines.push(kv("Vectorize", String(b.vectorize)));
+  lines.push(kv("Workers AI", String(b.ai)));
   lines.push("");
   lines.push("Remote environment");
   const authLabel =
@@ -358,9 +355,11 @@ export function formatDoctorReport(
       : fingerprint.cloudflareAuth === "missing"
         ? "not configured"
         : "unknown (may use wrangler login)";
-  lines.push(`  Cloudflare ............. ${authLabel}`);
+  lines.push(kv("Cloudflare", authLabel));
   if (fingerprint.cloudflareAuth === "missing") {
-    lines.push("  remote tests ........... REMOTE_NOT_CONFIGURED until authenticated");
+    lines.push(
+      kv("remote tests", "BLOCKED (REMOTE_NOT_CONFIGURED until authenticated)"),
+    );
   }
   if (verbose) {
     lines.push("");
