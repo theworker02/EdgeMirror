@@ -1,0 +1,17 @@
+EdgeMirror 0.1.0  run demo-screenshot-001  [DEMO]
+
+Checks
+  [FAILED]  DEMO isolated divergence — Intentional DEMO body mismatch
+
+Parity results
+  [DIVERGENT]  EM-DEMO-001  POSSIBLE_RUNTIME_DIVERGENCE  conf=0.94
+      Δ http.body: local="demo-local-ok" remote="demo-remote-different"
+
+Score
+  overall ............... n/a (DEMO fixture — score withheld)
+  matched ............... 0
+  divergent ............. 1
+  insufficient .......... 0
+  remote not configured .. 0
+
+DEMO — not production evidence. Do not copy into a real project's .edgemirror/

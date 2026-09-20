@@ -1,0 +1,51 @@
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --em-ink: #e8eef2;
+  --em-muted: #8a9aa6;
+  --em-surface: #0c1116;
+  --em-panel: #141b22;
+  --em-panel-2: #1a232c;
+  --em-line: #243040;
+  --em-mirror: #3dbaa8;
+  --em-local: #6aa3d8;
+  --em-remote: #d4a574;
+  --em-status-verified: #3dbaa8;
+  --em-status-divergent: #e07a6a;
+  --em-status-running: #6aa3d8;
+  --em-status-unknown: #8a9aa6;
+  --em-status-stale: #c4a56a;
+  --em-status-blocked: #c4a56a;
+  --em-status-failed: #e07a6a;
+  --em-status-demo: #c47ac0;
+  --em-font-sans: "IBM Plex Sans", "Source Sans 3", "Segoe UI", sans-serif;
+  --em-font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", monospace;
+  --em-space-1: 4px;
+  --em-space-2: 8px;
+  --em-space-3: 12px;
+  --em-space-4: 16px;
+  --em-space-5: 24px;
+  --em-space-6: 32px;
+  --em-radius: 4px;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --em-ink: #0e1419;
+  --em-muted: #5a6a75;
+  --em-surface: #f4f6f8;
+  --em-panel: #ffffff;
+  --em-panel-2: #eef1f4;
+  --em-line: #d0d8de;
+  --em-mirror: #1a7a6d;
+  --em-local: #2b5a8a;
+  --em-remote: #6b4a1f;
+  --em-status-verified: #1a7a6d;
+  --em-status-divergent: #a33b2b;
+  --em-status-running: #2b5a8a;
+  --em-status-unknown: #5a6a75;
+  --em-status-stale: #8a7040;
+  --em-status-blocked: #8a7040;
+  --em-status-failed: #a33b2b;
+  --em-status-demo: #8a3d84;
+}

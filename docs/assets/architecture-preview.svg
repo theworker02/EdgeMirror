@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="EdgeMirror architecture preview">
+  <rect width="960" height="520" fill="#f4f6f8"/>
+  <text x="40" y="48" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="22" font-weight="600" fill="#0e1419">Architecture preview</text>
+  <text x="40" y="72" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="13" fill="#5a6a75">discover ’ execute local + remote ’ normalize ’ diff ’ evidence</text>
+
+  <!-- boxes -->
+  <g font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="13">
+    <rect x="40" y="120" width="160" height="64" fill="#fff" stroke="#d0d8de"/>
+    <text x="56" y="148" fill="#0e1419" font-weight="600">Discover</text>
+    <text x="56" y="168" fill="#5a6a75">doctor / fingerprint</text>
+
+    <rect x="260" y="80" width="160" height="64" fill="#fff" stroke="#2b5a8a"/>
+    <text x="276" y="108" fill="#2b5a8a" font-weight="600">Local</text>
+    <text x="276" y="128" fill="#5a6a75">wrangler / workerd</text>
+
+    <rect x="260" y="180" width="160" height="64" fill="#fff" stroke="#6b4a1f"/>
+    <text x="276" y="208" fill="#6b4a1f" font-weight="600">Remote</text>
+    <text x="276" y="228" fill="#5a6a75">or BLOCKED</text>
+
+    <rect x="480" y="120" width="160" height="64" fill="#fff" stroke="#1a7a6d"/>
+    <text x="496" y="148" fill="#1a7a6d" font-weight="600">Normalize + Diff</text>
+    <text x="496" y="168" fill="#5a6a75">inspectable rules</text>
+
+    <rect x="700" y="120" width="200" height="64" fill="#fff" stroke="#0e1419"/>
+    <text x="716" y="148" fill="#0e1419" font-weight="600">Evidence receipt</text>
+    <text x="716" y="168" fill="#5a6a75">artifacts + report</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#5a6a75" stroke-width="1.5" fill="none" marker-end="url(#m)">
+    <defs>
+      <marker id="m" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6" fill="none" stroke="#5a6a75"/>
+      </marker>
+    </defs>
+    <path d="M200 152h60"/>
+    <path d="M230 152v60h30"/>
+    <path d="M420 112h60v40"/>
+    <path d="M420 212h60v-40"/>
+    <path d="M640 152h60"/>
+  </g>
+
+  <text x="40" y="320" font-family="IBM Plex Mono, monospace" font-size="12" fill="#5a6a75">Exit codes: 0 verified · 1 divergent · 2 failed · 3 insufficient evidence</text>
+  <text x="40" y="360" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="12" fill="#8a3d84">Never fabricates remote results when credentials are absent.</text>
+</svg>
