@@ -91,6 +91,7 @@ export class LocalExecutionTarget implements ExecutionTarget {
     });
 
     const deadline = Date.now() + 60_000;
+    let delayMs = 100;
     while (Date.now() < deadline) {
       if (this.child.exitCode !== null) {
         throw new Error(
@@ -98,7 +99,10 @@ export class LocalExecutionTarget implements ExecutionTarget {
         );
       }
       try {
-        const res = await fetch(this.baseUrl!, { method: "GET", signal: AbortSignal.timeout(2000) });
+        const res = await fetch(this.baseUrl!, {
+          method: "GET",
+          signal: AbortSignal.timeout(2000),
+        });
         // Any HTTP response means the server is up (even 404).
         if (res.status >= 100) {
           this.ready = true;
@@ -110,16 +114,20 @@ export class LocalExecutionTarget implements ExecutionTarget {
       // Also detect ready banners
       if (/Ready on|Local:|http:\/\/127\.0\.0\.1/i.test(this.stdout + this.stderr)) {
         // give it a moment then probe again
-        await delay(300);
+        await delay(Math.min(delayMs, 300));
         try {
-          await fetch(this.baseUrl!, { method: "GET", signal: AbortSignal.timeout(2000) });
+          await fetch(this.baseUrl!, {
+            method: "GET",
+            signal: AbortSignal.timeout(2000),
+          });
           this.ready = true;
           return;
         } catch {
           /* continue */
         }
       }
-      await delay(250);
+      await delay(delayMs);
+      delayMs = Math.min(1000, Math.floor(delayMs * 1.4));
     }
     throw new Error(
       `Timed out waiting for local wrangler dev on port ${this.port}.\n${this.stderr || this.stdout}`,

@@ -10,12 +10,18 @@ import { ensureArtifactsDir, loadConfig } from "../config/index.js";
 import { LocalExecutionTarget } from "../execution/local.js";
 import { selectTests } from "../corpus/index.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
+import { buildOptimizedMatrix } from "../supercharger/matrix.js";
+import { runScheduler } from "../supercharger/scheduler.js";
+import type { JobSpec, GovernorMode } from "../supercharger/types.js";
 
 export interface CompatOptions {
   cwd?: string;
   dates?: string[];
   filter?: string;
   quiet?: boolean;
+  /** Optional Supercharger matrix prune + scheduled local cells */
+  supercharge?: boolean;
+  mode?: GovernorMode;
 }
 
 export interface CompatCell {
@@ -87,45 +93,73 @@ export async function runCompatMatrix(
   const cells: CompatCell[] = [];
   let failed = false;
 
-  for (const date of dates) {
-    const local = new LocalExecutionTarget({
-      projectRoot: discovered.projectRoot,
-      wranglerConfigPath: discovered.wranglerConfigPath,
-      configurationFingerprint: {
-        ...discovered.configurationFingerprint,
-        compatibilityDate: date,
-      },
-      ownershipDir: join(artifacts, "ownership"),
-      compatibilityDateOverride: date,
-    });
+  // Prune impossible combinations before execution (always safe; opt-in scheduling).
+  const optimized = buildOptimizedMatrix({
+    dates,
+    testIds: tests.map((t) => t.id),
+  });
+  if (!options.quiet && optimized.pruned.length > 0) {
+    console.log(optimized.note);
+  }
 
-    try {
-      await local.prepare();
-      for (const test of tests) {
-        const trace = await local.execute(test);
-        const httpStatus =
-          trace.observations.http.status.availability === "captured"
-            ? trace.observations.http.status.value
-            : undefined;
-        cells.push({
-          compatibilityDate: date,
-          testId: test.id,
-          status: trace.status === "ok" ? "ok" : "error",
-          httpStatus,
-          reason: trace.statusReason,
-        });
-        if (trace.status !== "ok") failed = true;
-      }
-    } catch (err) {
-      failed = true;
+  const workDates = [
+    ...new Set(optimized.keep.map((c) => c.compatibilityDate)),
+  ];
+  if (workDates.length === 0) {
+    for (const p of optimized.pruned) {
       cells.push({
-        compatibilityDate: date,
-        testId: tests[0]?.id ?? "unknown",
-        status: "error",
-        reason: err instanceof Error ? err.message : String(err),
+        compatibilityDate: p.compatibilityDate,
+        testId: p.testId,
+        status: "skipped",
+        reason: p.reason,
       });
-    } finally {
-      await local.cleanup();
+    }
+  } else if (options.supercharge && workDates.length > 1) {
+    // Schedule independent date cells via Supercharger (each cell still prepares its own local runtime).
+    const jobs: JobSpec[] = workDates.map((date) => ({
+      id: `compat:${date}`,
+      kind: "compat_cell" as const,
+      name: `Compat ${date}`,
+      priority: 2 as const,
+      estimatedCu: 8,
+      dependsOn: [],
+      meta: { date },
+    }));
+
+    const schedule = await runScheduler({
+      jobs,
+      options: {
+        enabled: true,
+        mode: options.mode ?? "BALANCED",
+      },
+      execute: async (job) => {
+        const date = String(job.meta?.date);
+        const cellResults = await runCompatDate({
+          date,
+          tests,
+          discovered,
+          artifacts,
+        });
+        for (const c of cellResults) {
+          cells.push(c);
+          if (c.status === "error") failed = true;
+        }
+        return { cu: 8 };
+      },
+    });
+    void schedule;
+  } else {
+    for (const date of workDates) {
+      const cellResults = await runCompatDate({
+        date,
+        tests,
+        discovered,
+        artifacts,
+      });
+      for (const c of cellResults) {
+        cells.push(c);
+        if (c.status === "error") failed = true;
+      }
     }
   }
 
@@ -137,10 +171,13 @@ export async function runCompatMatrix(
     runId,
     projectRoot: discovered.projectRoot,
     baselineDate: baseline,
-    dates,
+    dates: workDates,
     cells,
     note:
-      "Local-only compatibility matrix. Each cell is from a real wrangler dev --local run with a compatibility_date overlay. Remote/preview matrix requires CLOUDFLARE_API_TOKEN — cells are never fabricated.",
+      "Local-only compatibility matrix. Each cell is from a real wrangler dev --local run with a compatibility_date overlay. Remote/preview matrix requires CLOUDFLARE_API_TOKEN — cells are never fabricated." +
+      (options.supercharge
+        ? " Supercharger pruned impossible cells and may schedule independent dates."
+        : ""),
   };
 
   writeFileSync(join(runDir, "compat.json"), JSON.stringify(report, null, 2));
@@ -156,4 +193,51 @@ export async function runCompatMatrix(
   }
 
   return { report, exitCode: failed ? 1 : 0 };
+}
+
+async function runCompatDate(input: {
+  date: string;
+  tests: ReturnType<typeof selectTests>;
+  discovered: ReturnType<typeof discoverProject>;
+  artifacts: string;
+}): Promise<CompatCell[]> {
+  const cells: CompatCell[] = [];
+  const local = new LocalExecutionTarget({
+    projectRoot: input.discovered.projectRoot,
+    wranglerConfigPath: input.discovered.wranglerConfigPath,
+    configurationFingerprint: {
+      ...input.discovered.configurationFingerprint,
+      compatibilityDate: input.date,
+    },
+    ownershipDir: join(input.artifacts, "ownership"),
+    compatibilityDateOverride: input.date,
+  });
+
+  try {
+    await local.prepare();
+    for (const test of input.tests) {
+      const trace = await local.execute(test);
+      const httpStatus =
+        trace.observations.http.status.availability === "captured"
+          ? trace.observations.http.status.value
+          : undefined;
+      cells.push({
+        compatibilityDate: input.date,
+        testId: test.id,
+        status: trace.status === "ok" ? "ok" : "error",
+        httpStatus,
+        reason: trace.statusReason,
+      });
+    }
+  } catch (err) {
+    cells.push({
+      compatibilityDate: input.date,
+      testId: input.tests[0]?.id ?? "unknown",
+      status: "error",
+      reason: err instanceof Error ? err.message : String(err),
+    });
+  } finally {
+    await local.cleanup();
+  }
+  return cells;
 }

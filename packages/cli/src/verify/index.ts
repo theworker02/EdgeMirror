@@ -17,6 +17,7 @@ import { randomUUID } from "node:crypto";
 import { ensureArtifactsDir } from "../config/index.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
 import { scoreParityResults } from "../diff/index.js";
+import type { SuperchargeOptions } from "../supercharger/types.js";
 
 export interface VerifyOptions {
   cwd?: string;
@@ -28,6 +29,8 @@ export interface VerifyOptions {
   ci?: boolean;
   filter?: string;
   quiet?: boolean;
+  /** Optional — omit entirely for stock OSS verify path */
+  supercharge?: SuperchargeOptions;
 }
 
 function runCommand(
@@ -141,6 +144,7 @@ export async function runVerify(
   }
 
   // Parity suite (local + remote/preview as available)
+  // Supercharger is opt-in; without it this path is unchanged.
   const parity = await runParitySuite({
     cwd: discovery.projectRoot,
     filter: options.filter,
@@ -152,6 +156,7 @@ export async function runVerify(
     formats: [options.format ?? "terminal", "json"],
     runId: `${runId}-parity`,
     quiet: true,
+    supercharge: options.supercharge,
   });
 
   for (const c of parity.report.checks ?? []) {
