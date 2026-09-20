@@ -12,6 +12,11 @@ import {
 } from "../../adapters/cloudflare/index.js";
 import { buildCloudflareSupportReport } from "../../adapters/cloudflare/support-report.js";
 
+function kv(label: string, value: string, width = 24): string {
+  const dots = ".".repeat(Math.max(2, width - label.length));
+  return `  ${label} ${dots} ${value}`;
+}
+
 export function registerDoctorCommand(program: Command): void {
   program
     .command("doctor")
@@ -67,17 +72,20 @@ export function registerDoctorCommand(program: Command): void {
 
           console.log("");
           console.log("Authentication");
-          console.log(`  mode ................... ${auth.mode}`);
-          console.log(`  status ................. ${auth.label}`);
+          console.log(kv("mode", auth.mode));
+          console.log(kv("status", auth.label));
           console.log(
-            `  account id ............. ${auth.accountIdPresent ? "present" : "not set"}`,
+            kv("account id", auth.accountIdPresent ? "present" : "not set"),
           );
           for (const h of auth.hints) {
-            console.log(`  note ................... ${h}`);
+            console.log(kv("note", h));
           }
           if (!auth.configured) {
             console.log(
-              "  remote/preview ......... REMOTE_NOT_CONFIGURED until authenticated",
+              kv(
+                "remote/preview",
+                "REMOTE_NOT_CONFIGURED until authenticated",
+              ),
             );
           }
 
@@ -101,17 +109,27 @@ export function registerDoctorCommand(program: Command): void {
           console.log("");
           console.log("Zero-config extras");
           console.log(
-            `  Vitest ................. ${zc.vitest.detected ? (zc.vitest.cloudflarePool ? "detected (CF pool)" : "detected") : "not found"}`,
+            kv(
+              "Vitest",
+              zc.vitest.detected
+                ? zc.vitest.cloudflarePool
+                  ? "detected (CF pool)"
+                  : "detected"
+                : "not found",
+            ),
           );
+          console.log(kv("Vite", zc.vite.detected ? "detected" : "not found"));
           console.log(
-            `  Vite ................... ${zc.vite.detected ? "detected" : "not found"}`,
+            kv("TypeScript", zc.typescript.detected ? "detected" : "not found"),
           );
+          console.log(kv("package manager", zc.packageManager));
           console.log(
-            `  TypeScript ............. ${zc.typescript.detected ? "detected" : "not found"}`,
-          );
-          console.log(`  package manager ........ ${zc.packageManager}`);
-          console.log(
-            `  preview support ........ ${auth.configured ? "credentials present (versions upload)" : "REMOTE_NOT_CONFIGURED"}`,
+            kv(
+              "preview support",
+              auth.configured
+                ? "credentials present (versions upload)"
+                : "REMOTE_NOT_CONFIGURED",
+            ),
           );
         } catch (err) {
           if (err instanceof EdgeMirrorDiscoveryError) {
