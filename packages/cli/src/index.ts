@@ -11,6 +11,7 @@ export {
   formatDoctorReport,
   EdgeMirrorDiscoveryError,
   parseWranglerConfig,
+  summarizeBindings,
 } from "./discovery/index.js";
 export { discoverZeroConfig } from "./discovery/zeroconfig.js";
 export { normalizeTrace, listNormalizationRules } from "./normalizer/index.js";
@@ -24,3 +25,17 @@ export { runParitySuite } from "./orchestrator/index.js";
 export { runVerify } from "./verify/index.js";
 export { createEvidenceBundle, verifyBundle } from "./bundle/index.js";
 export { BUILTIN_CORPUS, selectTests } from "./corpus/index.js";
+export {
+  CLOUDFLARE_ADAPTER_ID,
+  CLOUDFLARE_BINDING_SUPPORT,
+  buildCloudflareSupportReport,
+  detectCloudflareAuth,
+  classifyInfraFailure,
+  formatBindingsSupportTable,
+  CloudflareBindingAdapter,
+  CloudflareLocalAdapter,
+  CloudflareRemoteAdapter,
+  CloudflarePreviewAdapter,
+} from "./adapters/cloudflare/index.js";
+export { runDemo, runPitchDemo, resetDemoResources } from "./demo/index.js";
+export { runCompatMatrix } from "./compat/index.js";

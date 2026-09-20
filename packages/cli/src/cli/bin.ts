@@ -10,7 +10,10 @@ import { registerPreviewCommand } from "./commands/preview.js";
 import { registerCompatCommand } from "./commands/compat.js";
 import { registerBundleCommand } from "./commands/bundle.js";
 import { registerDeployCommand } from "./commands/deploy.js";
-import { registerDemoCommand } from "./commands/demo.js";
+import {
+  registerDemoCommand,
+  registerPitchDemoCommand,
+} from "./commands/demo.js";
 import { registerCloudCommand } from "./commands/cloud.js";
 import { runDefaultAction } from "./onboarding.js";
 
@@ -33,13 +36,18 @@ Examples:
   edgemirror init
   edgemirror init --ci
   edgemirror doctor
+  edgemirror doctor --bindings
   edgemirror verify
   edgemirror v --format agent
   edgemirror demo            # isolated DEMO divergence (never mixes with real corpus)
+  edgemirror pitch-demo      # live local + optional Cloudflare preview (<5 min)
+  edgemirror demo cloudflare # same as pitch-demo
+  edgemirror demo reset      # ownership-safe Cloudflare cleanup
   edgemirror cloud billing   # Cloud billing status (requires API; OSS CLI stays free)
   edgemirror test --local
   edgemirror preview
   edgemirror compat --dates 2024-11-11,2025-04-01
+  edgemirror matrix --dates 2025-04-01
   edgemirror bundle EM-001
 `,
   );
@@ -53,6 +61,7 @@ registerCompatCommand(program);
 registerBundleCommand(program);
 registerDeployCommand(program);
 registerDemoCommand(program);
+registerPitchDemoCommand(program);
 registerCloudCommand(program);
 
 async function main(): Promise<void> {
@@ -65,9 +74,11 @@ async function main(): Promise<void> {
     "v",
     "preview",
     "compat",
+    "matrix",
     "bundle",
     "deploy",
     "demo",
+    "pitch-demo",
     "cloud",
     "help",
   ]);
@@ -75,8 +86,12 @@ async function main(): Promise<void> {
   const wantsHelp = argv.includes("-h") || argv.includes("--help");
   const wantsVersion = argv.includes("-V") || argv.includes("--version");
 
-  if ((!first || !known.has(first)) && !wantsHelp && !wantsVersion && argv.every((a) => a.startsWith("-") || !known.has(a))) {
-    // Bare invocation or only global flags → onboarding / auto-verify
+  if (
+    (!first || !known.has(first)) &&
+    !wantsHelp &&
+    !wantsVersion &&
+    argv.every((a) => a.startsWith("-") || !known.has(a))
+  ) {
     if (argv.includes("--auto-verify")) {
       process.env.EDGEMIRROR_AUTO_VERIFY = "1";
     }

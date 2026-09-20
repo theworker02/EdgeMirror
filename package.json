@@ -12,6 +12,7 @@
     "test": "npm run test:billing && npm run test -w @edgemirror/cli",
     "test:billing": "npm run build -w @edgemirror/organizations && npm run build -w @edgemirror/billing && npm run test -w @edgemirror/organizations && npm run test -w @edgemirror/billing && npm run test -w @edgemirror/api",
     "test:unit": "npm run test:unit -w @edgemirror/cli",
+    "test:cloudflare-live": "npm run test:cloudflare-live -w @edgemirror/cli",
     "lint": "npm run lint -w @edgemirror/cli",
     "edgemirror": "node packages/cli/dist/cli/bin.js",
     "api": "npm run start -w @edgemirror/api",

@@ -1,12 +1,8 @@
 import type { Command } from "commander";
 import { runCompatMatrix } from "../../compat/index.js";
 
-export function registerCompatCommand(program: Command): void {
-  program
-    .command("compat")
-    .description(
-      "Compatibility-date matrix (local real executions; remote not fabricated)",
-    )
+function registerMatrixAction(command: Command): void {
+  command
     .option(
       "--dates <list>",
       "Comma-separated compatibility dates (defaults to wrangler date)",
@@ -22,4 +18,18 @@ export function registerCompatCommand(program: Command): void {
       });
       process.exitCode = exitCode;
     });
+}
+
+export function registerCompatCommand(program: Command): void {
+  const compat = program
+    .command("compat")
+    .description(
+      "Compatibility-date matrix (local real executions only; never fabricates cells)",
+    );
+  registerMatrixAction(compat);
+
+  const matrix = program
+    .command("matrix")
+    .description("Alias for `edgemirror compat` — real local matrix cells only");
+  registerMatrixAction(matrix);
 }

@@ -140,7 +140,7 @@ export async function runCompatMatrix(
     dates,
     cells,
     note:
-      "Local-only compatibility matrix. Remote/preview matrix requires CLOUDFLARE_API_TOKEN — not fabricated.",
+      "Local-only compatibility matrix. Each cell is from a real wrangler dev --local run with a compatibility_date overlay. Remote/preview matrix requires CLOUDFLARE_API_TOKEN — cells are never fabricated.",
   };
 
   writeFileSync(join(runDir, "compat.json"), JSON.stringify(report, null, 2));
