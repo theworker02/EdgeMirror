@@ -15,6 +15,8 @@ import {
   registerPitchDemoCommand,
 } from "./commands/demo.js";
 import { registerCloudCommand } from "./commands/cloud.js";
+import { registerSuperchargeCommand } from "./commands/supercharge.js";
+import { registerRunnerCommand } from "./commands/runner.js";
 import { runDefaultAction } from "./onboarding.js";
 import { formatError } from "./ux.js";
 
@@ -39,6 +41,8 @@ ${pc.bold("Examples")}
   edgemirror doctor
   edgemirror doctor --bindings
   edgemirror verify
+  edgemirror verify --supercharge
+  edgemirror verify --fast
   edgemirror v --format agent
   edgemirror demo            # isolated DEMO divergence (never mixes with real corpus)
   edgemirror pitch-demo      # live local + optional Cloudflare preview (<5 min)
@@ -49,6 +53,10 @@ ${pc.bold("Examples")}
   edgemirror preview
   edgemirror compat --dates 2024-11-11,2025-04-01
   edgemirror matrix --dates 2025-04-01
+  edgemirror supercharge doctor
+  edgemirror supercharge plan
+  edgemirror supercharge bench
+  edgemirror runner start
   edgemirror bundle EM-001
 
 ${pc.bold("Status language")}  VERIFIED · DIVERGENT · RUNNING · UNKNOWN · STALE · BLOCKED · FAILED · DEMO
@@ -66,6 +74,8 @@ registerDeployCommand(program);
 registerDemoCommand(program);
 registerPitchDemoCommand(program);
 registerCloudCommand(program);
+registerSuperchargeCommand(program);
+registerRunnerCommand(program);
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -83,6 +93,8 @@ async function main(): Promise<void> {
     "demo",
     "pitch-demo",
     "cloud",
+    "supercharge",
+    "runner",
     "help",
   ]);
   const first = argv.find((a) => !a.startsWith("-"));

@@ -6,7 +6,7 @@ Same `ParityTest` executed on local and remote/preview targets; traces compared 
 
 ## Evidence
 
-Findings carry hashed receipts (`EM-###`). See [EVIDENCE_MODEL.md](../EVIDENCE_MODEL.md).
+Findings carry hashed receipts (`EM-###`). See [EVIDENCE_MODEL.md](../../EVIDENCE_MODEL.md).
 
 ## Classifications
 

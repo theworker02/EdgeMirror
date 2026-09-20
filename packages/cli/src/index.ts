@@ -39,3 +39,15 @@ export {
 } from "./adapters/cloudflare/index.js";
 export { runDemo, runPitchDemo, resetDemoResources } from "./demo/index.js";
 export { runCompatMatrix } from "./compat/index.js";
+export {
+  runScheduler,
+  buildParityDag,
+  buildSuperchargePlan,
+  evaluatePerfGates,
+  runMicrobench,
+  selectForMode,
+  pruneCompatMatrix,
+  startRunner,
+  type SuperchargeOptions,
+  type GovernorMode,
+} from "./supercharger/index.js";

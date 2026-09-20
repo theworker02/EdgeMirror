@@ -1,0 +1,62 @@
+{
+  "bench": {
+    "schemaVersion": "1.0",
+    "kind": "supercharger-microbench",
+    "measuredAt": "2026-09-20T01:23:11.396Z",
+    "workload": {
+      "jobs": 16,
+      "sleepMs": 10,
+      "mode": "FAST"
+    },
+    "standard": {
+      "label": "sequential",
+      "wallMs": 243,
+      "jobsPerSec": 65.76
+    },
+    "supercharger": {
+      "label": "scheduler",
+      "wallMs": 44,
+      "jobsPerSec": 363.64,
+      "concurrency": 8,
+      "cacheHits": 0,
+      "cuUsed": 16
+    },
+    "ratio": {
+      "wallSpeedupMeasured": 5.53
+    },
+    "disclaimer": "Measured synthetic I/O-bound jobs only. Not a claim about wrangler/parity verify speedups. Re-run on your machine."
+  },
+  "gates": {
+    "passed": true,
+    "results": [
+      {
+        "id": "microbench-completes",
+        "severity": "hard",
+        "pass": true,
+        "detail": "standard=243ms supercharger=44ms",
+        "description": "Synthetic microbench finishes and reports measurements"
+      },
+      {
+        "id": "scheduler-not-slower-than-3x",
+        "severity": "hard",
+        "pass": true,
+        "detail": "ratio=0.181 (limit 3.0)",
+        "description": "Scheduler wall time should not be >3× sequential on synthetic I/O (catastrophic regression)"
+      },
+      {
+        "id": "cu-accounting-present",
+        "severity": "hard",
+        "pass": true,
+        "detail": "cuUsed=16",
+        "description": "CU ledger records usage (accounting only)"
+      },
+      {
+        "id": "no-fake-speedup-field",
+        "severity": "hard",
+        "pass": true,
+        "detail": "ratioKeys=wallSpeedupMeasured",
+        "description": "Results must expose measured ratio only (no marketing speedup field)"
+      }
+    ]
+  }
+}

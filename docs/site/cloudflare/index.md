@@ -11,4 +11,4 @@ Source of truth for capability claims: Agent 2 support report (`.agent/cloudflar
 | [Preview & deploy](./preview-deploy.md) | Preview URLs and `edgemirror deploy` |
 | [Live demo](./live-demo.md) | pitch-demo / demo reset (post-merge) |
 
-Canonical: [CLOUDFLARE_INTEGRATION.md](../CLOUDFLARE_INTEGRATION.md)
+Canonical: [CLOUDFLARE_INTEGRATION.md](../../CLOUDFLARE_INTEGRATION.md)

@@ -1,0 +1,13 @@
+{
+  "profiledAt": "2026-09-20T01:12:08.725Z",
+  "cpus": 32,
+  "freeMemMb": 46560,
+  "totalMemMb": 65906,
+  "syntheticJobs": 40,
+  "jobSleepMs": 5,
+  "sequentialMs": 605,
+  "parallel2Ms": 312,
+  "parallel4Ms": 156,
+  "parallelMaxMs": 76,
+  "note": "Synthetic I/O-bound jobs only. Not a product speedup claim. Identifies scheduler parallelism headroom before Runner/Wrangler costs."
+}
