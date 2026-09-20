@@ -35,6 +35,10 @@ import {
 } from "../reporter/index.js";
 import type { ParityResult, ParityTest } from "../trace/schema.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
+import type { SuperchargeOptions } from "../supercharger/types.js";
+import { selectForMode } from "../supercharger/selection.js";
+import { accelerateLocalExecutes } from "../supercharger/accelerate.js";
+import { defaultCacheDir } from "../supercharger/cache.js";
 
 export interface OrchestratorOptions {
   cwd?: string;
@@ -48,6 +52,8 @@ export interface OrchestratorOptions {
   tests?: ParityTest[];
   runId?: string;
   quiet?: boolean;
+  /** Optional Supercharger — when omitted/disabled, behavior matches stock OSS path */
+  supercharge?: SuperchargeOptions;
 }
 
 export interface OrchestratorResult {
@@ -125,13 +131,31 @@ export async function runParitySuite(
   const startedAt = new Date().toISOString();
   resetFindingCounter(0);
 
-  const tests =
+  let tests =
     options.tests ??
     selectTests({
       includeBuiltin: config.corpus.includeBuiltin,
       paths: config.corpus.paths.map((p) => join(discovered.projectRoot, p)),
       filter: options.filter,
     });
+
+  // Selection modes (--fast/--full/--nightly/incremental) work even without scheduler.
+  const selectionMode = options.supercharge?.selection;
+  if (selectionMode && selectionMode !== "full") {
+    const sel = selectForMode(tests, selectionMode, {
+      projectRoot: discovered.projectRoot,
+      cacheDir:
+        options.supercharge?.cacheDir ??
+        defaultCacheDir(discovered.projectRoot),
+    });
+    tests = sel.selected;
+    if (!options.quiet) {
+      console.log(`Selection (${sel.mode}): ${sel.reason}`);
+      console.log(sel.estimateNote);
+    }
+  }
+
+  const useScheduler = Boolean(options.supercharge?.enabled);
 
   const ownershipDir = join(artifactsRoot, "ownership");
   const budget: RemoteBudgetState = {
@@ -247,54 +271,48 @@ export async function runParitySuite(
   const results: ParityResult[] = [];
 
   try {
-    for (const test of tests) {
-      const localTraceRaw = await local.execute(test);
-      const remoteTraceRaw = skipRemote
-        ? await createSkippedRemote(test, discovered, remoteReason ?? "skipped")
-        : await remote.execute(test);
-
-      const localRedacted = redactDeep(
-        localTraceRaw,
-        config.redaction.enabled ? config.redaction.patterns : [],
-      );
-      const remoteRedacted = redactDeep(
-        remoteTraceRaw,
-        config.redaction.enabled ? config.redaction.patterns : [],
-      );
-      localRedacted.value.redactions = localRedacted.redactions;
-      remoteRedacted.value.redactions = remoteRedacted.redactions;
-
-      const localPath = writeTrace(
-        join(runDir, "traces"),
-        localRedacted.value,
-      );
-      const remotePath = writeTrace(
-        join(runDir, "traces"),
-        remoteRedacted.value,
-      );
-
-      const findingId = nextFindingId("EM");
-      const result = buildParityResult({
-        testId: test.id,
-        local: localRedacted.value,
-        remote: remoteRedacted.value,
-        expectedBehavior: test.expectedBehavior,
-        findingId,
+    if (useScheduler) {
+      // Parallel local executes after prepare; remote stays sequential (rate limits).
+      const { tracesByTestId } = await accelerateLocalExecutes({
+        tests,
+        local,
+        options: options.supercharge,
       });
-      result.evidence.push(
-        { kind: "artifact", description: "local trace", artifactPath: localPath },
-        { kind: "artifact", description: "remote trace", artifactPath: remotePath },
-      );
 
-      const receipt = createReceipt({
-        findingId,
-        result,
-        localTrace: localRedacted.value,
-        remoteTrace: remoteRedacted.value,
-        artifactPaths: [localPath, remotePath],
-      });
-      writeReceipt(join(runDir, "receipts"), receipt);
-      results.push(result);
+      for (const test of tests) {
+        const localTraceRaw = tracesByTestId.get(test.id);
+        if (!localTraceRaw) {
+          throw new Error(`Supercharger missed local trace for ${test.id}`);
+        }
+        const remoteTraceRaw = skipRemote
+          ? await createSkippedRemote(test, discovered, remoteReason ?? "skipped")
+          : await remote.execute(test);
+
+        await pushResult({
+          test,
+          localTraceRaw,
+          remoteTraceRaw,
+          config,
+          runDir,
+          results,
+        });
+      }
+    } else {
+      for (const test of tests) {
+        const localTraceRaw = await local.execute(test);
+        const remoteTraceRaw = skipRemote
+          ? await createSkippedRemote(test, discovered, remoteReason ?? "skipped")
+          : await remote.execute(test);
+
+        await pushResult({
+          test,
+          localTraceRaw,
+          remoteTraceRaw,
+          config,
+          runDir,
+          results,
+        });
+      }
     }
   } finally {
     await local.cleanup();
@@ -343,6 +361,55 @@ async function createSkippedRemote(
     configurationFingerprint: discovered.configurationFingerprint,
     observations: emptyObservations(),
   });
+}
+
+async function pushResult(input: {
+  test: ParityTest;
+  localTraceRaw: Awaited<ReturnType<ExecutionTarget["execute"]>>;
+  remoteTraceRaw: Awaited<ReturnType<ExecutionTarget["execute"]>>;
+  config: EdgeMirrorConfig;
+  runDir: string;
+  results: ParityResult[];
+}): Promise<void> {
+  const localRedacted = redactDeep(
+    input.localTraceRaw,
+    input.config.redaction.enabled ? input.config.redaction.patterns : [],
+  );
+  const remoteRedacted = redactDeep(
+    input.remoteTraceRaw,
+    input.config.redaction.enabled ? input.config.redaction.patterns : [],
+  );
+  localRedacted.value.redactions = localRedacted.redactions;
+  remoteRedacted.value.redactions = remoteRedacted.redactions;
+
+  const localPath = writeTrace(join(input.runDir, "traces"), localRedacted.value);
+  const remotePath = writeTrace(
+    join(input.runDir, "traces"),
+    remoteRedacted.value,
+  );
+
+  const findingId = nextFindingId("EM");
+  const result = buildParityResult({
+    testId: input.test.id,
+    local: localRedacted.value,
+    remote: remoteRedacted.value,
+    expectedBehavior: input.test.expectedBehavior,
+    findingId,
+  });
+  result.evidence.push(
+    { kind: "artifact", description: "local trace", artifactPath: localPath },
+    { kind: "artifact", description: "remote trace", artifactPath: remotePath },
+  );
+
+  const receipt = createReceipt({
+    findingId,
+    result,
+    localTrace: localRedacted.value,
+    remoteTrace: remoteRedacted.value,
+    artifactPaths: [localPath, remotePath],
+  });
+  writeReceipt(join(input.runDir, "receipts"), receipt);
+  input.results.push(result);
 }
 
 function finishReport(input: {

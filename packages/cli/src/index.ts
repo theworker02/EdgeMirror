@@ -24,3 +24,15 @@ export { runParitySuite } from "./orchestrator/index.js";
 export { runVerify } from "./verify/index.js";
 export { createEvidenceBundle, verifyBundle } from "./bundle/index.js";
 export { BUILTIN_CORPUS, selectTests } from "./corpus/index.js";
+export {
+  runScheduler,
+  buildParityDag,
+  buildSuperchargePlan,
+  evaluatePerfGates,
+  runMicrobench,
+  selectForMode,
+  pruneCompatMatrix,
+  startRunner,
+  type SuperchargeOptions,
+  type GovernorMode,
+} from "./supercharger/index.js";

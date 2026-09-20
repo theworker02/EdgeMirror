@@ -11,6 +11,8 @@ import { registerCompatCommand } from "./commands/compat.js";
 import { registerBundleCommand } from "./commands/bundle.js";
 import { registerDeployCommand } from "./commands/deploy.js";
 import { registerDemoCommand } from "./commands/demo.js";
+import { registerSuperchargeCommand } from "./commands/supercharge.js";
+import { registerRunnerCommand } from "./commands/runner.js";
 import { runDefaultAction } from "./onboarding.js";
 
 const program = new Command();
@@ -33,11 +35,17 @@ Examples:
   edgemirror init --ci
   edgemirror doctor
   edgemirror verify
+  edgemirror verify --supercharge
+  edgemirror verify --fast
   edgemirror v --format agent
   edgemirror demo            # isolated DEMO divergence (never mixes with real corpus)
   edgemirror test --local
   edgemirror preview
   edgemirror compat --dates 2024-11-11,2025-04-01
+  edgemirror supercharge doctor
+  edgemirror supercharge plan
+  edgemirror supercharge bench
+  edgemirror runner start
   edgemirror bundle EM-001
 `,
   );
@@ -51,6 +59,8 @@ registerCompatCommand(program);
 registerBundleCommand(program);
 registerDeployCommand(program);
 registerDemoCommand(program);
+registerSuperchargeCommand(program);
+registerRunnerCommand(program);
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -65,6 +75,8 @@ async function main(): Promise<void> {
     "bundle",
     "deploy",
     "demo",
+    "supercharge",
+    "runner",
     "help",
   ]);
   const first = argv.find((a) => !a.startsWith("-"));

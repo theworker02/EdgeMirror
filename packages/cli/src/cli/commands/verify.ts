@@ -1,6 +1,7 @@
 import type { Command } from "commander";
 import { runVerify } from "../../verify/index.js";
 import type { ReportFormat } from "../../reporter/index.js";
+import type { GovernorMode } from "../../supercharger/types.js";
 
 export function registerVerifyCommand(program: Command): void {
   const action = async (opts: {
@@ -12,7 +13,18 @@ export function registerVerifyCommand(program: Command): void {
     ci?: boolean;
     filter?: string;
     quiet?: boolean;
+    supercharge?: boolean;
+    fast?: boolean;
+    full?: boolean;
+    nightly?: boolean;
+    mode?: string;
   }) => {
+    let selection: "full" | "fast" | "incremental" | "nightly" | undefined;
+    if (opts.nightly) selection = "nightly";
+    else if (opts.full) selection = "full";
+    else if (opts.fast) selection = "fast";
+    else if (opts.supercharge) selection = "incremental";
+
     const result = await runVerify({
       format: (opts.format ?? "terminal") as ReportFormat,
       vitest: opts.vitest,
@@ -22,6 +34,20 @@ export function registerVerifyCommand(program: Command): void {
       ci: opts.ci,
       filter: opts.filter,
       quiet: opts.quiet,
+      supercharge: opts.supercharge
+        ? {
+            enabled: true,
+            mode: (opts.mode ?? "BALANCED").toUpperCase() as GovernorMode,
+            selection: selection ?? "incremental",
+            timeToConfidence: true,
+            cache: true,
+          }
+        : selection
+          ? {
+              enabled: false,
+              selection,
+            }
+          : undefined,
     });
     process.exitCode = result.exitCode;
   };
@@ -39,6 +65,14 @@ export function registerVerifyCommand(program: Command): void {
     .option("--local", "Local-only parity (skip remote/preview)")
     .option("--ci", "CI exit codes")
     .option("--filter <pattern>", "Filter parity corpus tests")
+    .option(
+      "--supercharge",
+      "Optional Supercharger: adaptive local scheduling + CU budgets",
+    )
+    .option("--fast", "Time-to-confidence subset (honest reduced selection)")
+    .option("--full", "Full corpus selection")
+    .option("--nightly", "Nightly selection (currently full; labeled honestly)")
+    .option("--mode <mode>", "Supercharger governor ECO|BALANCED|FAST|MAX", "BALANCED")
     .option("-q, --quiet", "Suppress stdout report")
     .action(action);
 }
