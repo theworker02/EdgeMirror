@@ -1,0 +1,34 @@
+name: EdgeMirror Verify
+description: Run edgemirror verify with honest REMOTE_NOT_CONFIGURED when secrets are absent
+author: EdgeMirror
+
+inputs:
+  local-only:
+    description: Skip remote/preview execution
+    required: false
+    default: "true"
+  format:
+    description: Report format (terminal|json|agent)
+    required: false
+    default: "agent"
+  working-directory:
+    description: Worker project directory
+    required: false
+    default: "."
+
+runs:
+  using: composite
+  steps:
+    - name: Run EdgeMirror verify
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        ARGS=(verify --ci --format "${{ inputs.format }}")
+        if [ "${{ inputs.local-only }}" = "true" ]; then
+          ARGS+=(--local)
+        fi
+        if command -v edgemirror >/dev/null 2>&1; then
+          edgemirror "${ARGS[@]}"
+        else
+          npx --yes edgemirror "${ARGS[@]}"
+        fi

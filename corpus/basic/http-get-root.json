@@ -1,0 +1,10 @@
+[
+  {
+    "id": "http-get-root",
+    "name": "GET / returns 200",
+    "feature": "http",
+    "category": "http",
+    "request": { "method": "GET", "path": "/" },
+    "expectedBehavior": "parity"
+  }
+]

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+coverage/
+.edgemirror/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+.turbo/
+.wrangler/
+.dev.vars
+tmp/
+.tmp/

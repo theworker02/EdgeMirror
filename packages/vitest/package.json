@@ -1,0 +1,36 @@
+{
+  "name": "@edgemirror/vitest",
+  "version": "0.1.0",
+  "description": "Thin Vitest reporter/adapter for EdgeMirror — does not replace Vitest",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./reporter": {
+      "types": "./dist/reporter.d.ts",
+      "import": "./dist/reporter.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests"
+  },
+  "peerDependencies": {
+    "vitest": ">=2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2",
+    "vitest": "^3.0.9"
+  },
+  "license": "Apache-2.0"
+}
