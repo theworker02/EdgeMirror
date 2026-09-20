@@ -26,9 +26,11 @@ import { createReceipt, writeReceipt, writeTrace } from "../provenance/index.js"
 import { formatTerminalReport, writeReports } from "../reporter/index.js";
 import type { RunReport } from "../reporter/index.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
+import { DEMO_FINDING_PREFIX } from "./constants.js";
 
-export const DEMO_MARKER = "DEMO";
-export const DEMO_FINDING_PREFIX = "EM-DEMO-";
+export { DEMO_MARKER, DEMO_FINDING_PREFIX } from "./constants.js";
+export { runPitchDemo, type PitchDemoOptions, type PitchDemoResult } from "./pitch.js";
+export { resetDemoResources, type DemoResetResult } from "../cleanup/reset.js";
 
 export interface DemoOptions {
   quiet?: boolean;
