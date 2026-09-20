@@ -1,11 +1,11 @@
 import type { Command } from "commander";
-import { spawn } from "node:child_process";
 import { runVerify } from "../../verify/index.js";
 import { discoverProject } from "../../discovery/index.js";
+import { spawnWranglerSafe } from "../../security/spawn.js";
 
 /**
  * `edgemirror deploy` orchestrates verify then wrangler deploy.
- * Never replaces wrangler — always shells out.
+ * Never replaces wrangler — always shells out via argv-safe spawn.
  */
 export function registerDeployCommand(program: Command): void {
   program
@@ -33,28 +33,17 @@ export function registerDeployCommand(program: Command): void {
       }
 
       const discovered = discoverProject();
-      const passthrough = cmd.args ?? [];
-      const wranglerArgs = [
-        "wrangler",
-        "deploy",
-        "--config",
-        discovered.wranglerConfigPath,
-        ...passthrough,
-      ];
-
+      const passthrough = (cmd.args ?? []).filter(
+        (a) => typeof a === "string" && !a.includes("\0"),
+      );
       const code = await new Promise<number>((resolve) => {
-        const child = spawn(
-          process.platform === "win32" ? "npx.cmd" : "npx",
-          wranglerArgs,
-          {
-            cwd: discovered.projectRoot,
-            stdio: "inherit",
-            windowsHide: true,
-            shell: process.platform === "win32",
-            env: { ...process.env, WRANGLER_SEND_METRICS: "false" },
-          },
+        const { child } = spawnWranglerSafe(
+          discovered.projectRoot,
+          ["deploy", "--config", discovered.wranglerConfigPath, ...passthrough],
+          { stdio: "inherit" },
         );
         child.on("close", (c) => resolve(c ?? 1));
+        child.on("error", () => resolve(1));
       });
       process.exitCode = code;
     });

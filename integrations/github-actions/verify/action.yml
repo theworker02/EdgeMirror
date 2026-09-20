@@ -22,9 +22,18 @@ runs:
     - name: Run EdgeMirror verify
       shell: bash
       working-directory: ${{ inputs.working-directory }}
+      env:
+        EDGEMIRROR_FORMAT: ${{ inputs.format }}
+        EDGEMIRROR_LOCAL_ONLY: ${{ inputs.local-only }}
       run: |
-        ARGS=(verify --ci --format "${{ inputs.format }}")
-        if [ "${{ inputs.local-only }}" = "true" ]; then
+        # Inputs are passed via env to avoid shell interpolation / injection.
+        FORMAT="${EDGEMIRROR_FORMAT:-agent}"
+        case "$FORMAT" in
+          terminal|json|agent) ;;
+          *) echo "Invalid format input"; exit 2 ;;
+        esac
+        ARGS=(verify --ci --format "$FORMAT")
+        if [ "${EDGEMIRROR_LOCAL_ONLY:-true}" = "true" ]; then
           ARGS+=(--local)
         fi
         if command -v edgemirror >/dev/null 2>&1; then

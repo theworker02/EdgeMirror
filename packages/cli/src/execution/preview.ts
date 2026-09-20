@@ -3,7 +3,6 @@
  * When credentials are missing, returns REMOTE_NOT_CONFIGURED honestly.
  */
 
-import { spawn } from "node:child_process";
 import type { ExecutionContext, ExecutionTarget } from "./types.js";
 import type { ParityTest } from "../trace/schema.js";
 import {
@@ -13,6 +12,18 @@ import {
   headersFromFetch,
   unavailable,
 } from "../trace/factory.js";
+import { runWranglerSafe } from "../security/spawn.js";
+import {
+  assertAllowedPreviewUrl,
+  resolveWorkerRequestUrl,
+  UrlSafetyError,
+} from "../security/url.js";
+import {
+  assertRequestBodySize,
+  DEFAULT_FETCH_TIMEOUT_MS,
+  DEFAULT_MAX_RESPONSE_BYTES,
+  truncateToBytes,
+} from "../security/limits.js";
 
 function hasCloudflareCredentials(): boolean {
   return Boolean(
@@ -26,27 +37,7 @@ function runWrangler(
   args: string[],
   cwd: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
-    const child = spawn(cmd, ["wrangler", ...args], {
-      cwd,
-      env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "true" },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (c: Buffer) => {
-      stdout += c.toString("utf8");
-    });
-    child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf8");
-    });
-    child.on("close", (code) => {
-      resolve({ code: code ?? 1, stdout, stderr });
-    });
-  });
+  return runWranglerSafe(cwd, args);
 }
 
 function parsePreviewUrl(output: string): string | undefined {
@@ -54,7 +45,13 @@ function parsePreviewUrl(output: string): string | undefined {
     output.match(/https:\/\/[a-z0-9.-]+\.workers\.dev[^\s]*/i) ??
     output.match(/Preview\s+URL[:\s]+(https:\/\/\S+)/i) ??
     output.match(/Version preview[:\s]+(https:\/\/\S+)/i);
-  return match?.[1] ?? match?.[0];
+  const url = match?.[1] ?? match?.[0];
+  if (!url) return undefined;
+  try {
+    return assertAllowedPreviewUrl(url);
+  } catch {
+    return undefined;
+  }
 }
 
 export interface PreviewPrepareResult {
@@ -89,8 +86,16 @@ export class PreviewExecutionTarget implements ExecutionTarget {
 
   async prepare(): Promise<void> {
     if (this.opts.existingUrl) {
-      this.baseUrl = this.opts.existingUrl.replace(/\/$/, "");
-      this.configured = true;
+      try {
+        this.baseUrl = assertAllowedPreviewUrl(this.opts.existingUrl);
+        this.configured = true;
+      } catch (err) {
+        this.configured = false;
+        this.notConfiguredReason =
+          err instanceof UrlSafetyError
+            ? `PREVIEW_URL_REJECTED: ${err.message}`
+            : "PREVIEW_URL_REJECTED: invalid preview URL";
+      }
       return;
     }
 
@@ -112,17 +117,11 @@ export class PreviewExecutionTarget implements ExecutionTarget {
 
     // Prefer versions upload for preview URLs when available.
     const upload = await runWrangler(
-      [
-        "versions",
-        "upload",
-        "--config",
-        this.ctx.wranglerConfigPath,
-      ],
+      ["versions", "upload", "--config", this.ctx.wranglerConfigPath],
       this.ctx.projectRoot,
     );
 
     if (upload.code !== 0) {
-      // Fallback: try `wrangler deploy --dry-run` is not enough; report failure honestly.
       this.configured = false;
       this.notConfiguredReason = [
         "PREVIEW_NOT_AVAILABLE",
@@ -141,11 +140,11 @@ export class PreviewExecutionTarget implements ExecutionTarget {
     if (!url) {
       this.configured = false;
       this.notConfiguredReason =
-        "PREVIEW_NOT_AVAILABLE: Wrangler versions upload succeeded but no preview URL was found in output.";
+        "PREVIEW_NOT_AVAILABLE: Wrangler versions upload succeeded but no allowed preview URL was found in output.";
       return;
     }
 
-    this.baseUrl = url.replace(/\/$/, "");
+    this.baseUrl = url;
     this.configured = true;
   }
 
@@ -169,7 +168,22 @@ export class PreviewExecutionTarget implements ExecutionTarget {
       : unavailable("unset");
     observations.notes.push("Preview execution against Cloudflare preview/version URL");
 
-    const url = new URL(test.request.path, this.baseUrl);
+    try {
+      assertRequestBodySize(test.request.body);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return createTrace({
+        testId: test.id,
+        target: "remote",
+        status: "error",
+        statusReason: message,
+        configurationFingerprint: this.ctx.configurationFingerprint,
+        observations: emptyObservations(),
+        rawError: message,
+      });
+    }
+
+    const url = resolveWorkerRequestUrl(this.baseUrl, test.request.path);
     const started = Date.now();
     try {
       const res = await fetch(url, {
@@ -181,14 +195,20 @@ export class PreviewExecutionTarget implements ExecutionTarget {
           test.request.method !== "HEAD"
             ? test.request.body
             : undefined,
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(DEFAULT_FETCH_TIMEOUT_MS),
       });
-      const bodyText = await res.text();
+      const rawBody = await res.text();
+      const truncated = truncateToBytes(rawBody, DEFAULT_MAX_RESPONSE_BYTES);
+      if (truncated.truncated) {
+        observations.notes.push(
+          `Response truncated at ${DEFAULT_MAX_RESPONSE_BYTES} bytes (was ${truncated.originalBytes})`,
+        );
+      }
       observations.http.status = captured(res.status);
       observations.http.headers = captured(headersFromFetch(res.headers));
-      observations.http.body = captured(bodyText);
+      observations.http.body = captured(truncated.text);
       observations.http.bodyEncoding = captured(
-        bodyText.length === 0 ? "empty" : "utf8",
+        truncated.text.length === 0 ? "empty" : "utf8",
       );
       observations.durationMs = captured(Date.now() - started);
       observations.exception = captured(null);

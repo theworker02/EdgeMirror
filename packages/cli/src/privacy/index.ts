@@ -10,6 +10,11 @@ const DEFAULT_PATTERNS: Array<{ name: string; regex: RegExp }> = [
   { name: "aws-access-key", regex: /\bAKIA[0-9A-Z]{16}\b/g },
   { name: "private-key-block", regex: /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z ]*PRIVATE KEY-----/g },
   { name: "cf-api-token-env", regex: /(CLOUDFLARE_API_TOKEN["']?\s*[:=]\s*["']?)[^"',\s]+/gi },
+  { name: "cf-api-key-env", regex: /(CLOUDFLARE_API_KEY["']?\s*[:=]\s*["']?)[^"',\s]+/gi },
+  { name: "edgemirror-runner-token", regex: /\bemr_[a-f0-9]+\.[A-Za-z0-9_-]+\b/g },
+  { name: "edgemirror-entitlement", regex: /\bem1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g },
+  { name: "stripe-secret-key", regex: /\bsk_(?:live|test)_[A-Za-z0-9]+\b/g },
+  { name: "github-pat", regex: /\bgh[pousr]_[A-Za-z0-9]{20,}\b/g },
 ];
 
 export interface RedactionResult {
@@ -25,17 +30,26 @@ export function redactString(
   const redactions: string[] = [];
 
   for (const pattern of DEFAULT_PATTERNS) {
+    pattern.regex.lastIndex = 0;
     if (pattern.regex.test(value)) {
       pattern.regex.lastIndex = 0;
-      value = value.replace(pattern.regex, "[REDACTED]");
+      value = value.replace(pattern.regex, (match, group1) => {
+        // Preserve capture group prefixes (header names) when present.
+        if (typeof group1 === "string" && match.startsWith(group1)) {
+          return `${group1}[REDACTED]`;
+        }
+        return "[REDACTED]";
+      });
       redactions.push(pattern.name);
     }
     pattern.regex.lastIndex = 0;
   }
 
   for (const raw of extraPatterns) {
+    if (raw.length > 200) continue; // ignore pathological custom patterns
     try {
       const re = new RegExp(raw, "gi");
+      re.lastIndex = 0;
       if (re.test(value)) {
         re.lastIndex = 0;
         value = value.replace(re, "[REDACTED]");

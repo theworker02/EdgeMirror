@@ -24,3 +24,5 @@ export { runParitySuite } from "./orchestrator/index.js";
 export { runVerify } from "./verify/index.js";
 export { createEvidenceBundle, verifyBundle } from "./bundle/index.js";
 export { BUILTIN_CORPUS, selectTests } from "./corpus/index.js";
+export * from "./security/index.js";
+export { redactString, redactDeep } from "./privacy/index.js";

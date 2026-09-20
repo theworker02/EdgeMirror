@@ -10,9 +10,12 @@
     "build": "npm run build -w @edgemirror/cli && npm run build -w @edgemirror/vitest",
     "test": "npm run test -w @edgemirror/cli",
     "test:unit": "npm run test:unit -w @edgemirror/cli",
+    "test:security": "npm run test -w @edgemirror/cli -- tests/adversarial-security.test.ts",
     "lint": "npm run lint -w @edgemirror/cli",
     "edgemirror": "node packages/cli/dist/cli/bin.js",
-    "typecheck": "npm run typecheck -w @edgemirror/cli && npm run typecheck -w @edgemirror/vitest"
+    "typecheck": "npm run typecheck -w @edgemirror/cli && npm run typecheck -w @edgemirror/vitest",
+    "security:sbom": "node scripts/sbom-generate.mjs",
+    "security:audit": "node scripts/dependency-audit.mjs"
   },
   "engines": {
     "node": ">=20"

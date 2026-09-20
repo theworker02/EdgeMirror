@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -16,6 +15,18 @@ import {
   claimResource,
   type OwnedResource,
 } from "../cleanup/ownership.js";
+import { runWranglerSafe } from "../security/spawn.js";
+import {
+  assertAllowedPreviewUrl,
+  resolveWorkerRequestUrl,
+} from "../security/url.js";
+import {
+  assertRequestBodySize,
+  DEFAULT_FETCH_TIMEOUT_MS,
+  DEFAULT_MAX_RESPONSE_BYTES,
+  truncateToBytes,
+} from "../security/limits.js";
+import { assertOwnedResourceSafe } from "../security/ownership-guard.js";
 
 export interface RemotePrepareResult {
   configured: boolean;
@@ -36,34 +47,20 @@ function runWrangler(
   args: string[],
   cwd: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
-    const child = spawn(cmd, ["wrangler", ...args], {
-      cwd,
-      env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "true" },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (c: Buffer) => {
-      stdout += c.toString("utf8");
-    });
-    child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf8");
-    });
-    child.on("close", (code) => {
-      resolve({ code: code ?? 1, stdout, stderr });
-    });
-  });
+  return runWranglerSafe(cwd, args);
 }
 
 function parseDeployUrl(output: string): string | undefined {
   const match =
     output.match(/https:\/\/[a-z0-9.-]+\.workers\.dev/i) ??
     output.match(/Published\s+(https:\/\/\S+)/i);
-  return match?.[1] ?? match?.[0];
+  const url = match?.[1] ?? match?.[0];
+  if (!url) return undefined;
+  try {
+    return assertAllowedPreviewUrl(url);
+  } catch {
+    return undefined;
+  }
 }
 
 /**
@@ -210,7 +207,8 @@ export class RemoteCloudflareExecutionTarget implements ExecutionTarget {
       : unavailable("unset");
     observations.notes.push("Remote execution against isolated EdgeMirror temporary Worker");
 
-    const url = new URL(test.request.path, this.baseUrl);
+    assertRequestBodySize(test.request.body);
+    const url = resolveWorkerRequestUrl(this.baseUrl, test.request.path);
     const started = Date.now();
     try {
       const res = await fetch(url, {
@@ -222,14 +220,22 @@ export class RemoteCloudflareExecutionTarget implements ExecutionTarget {
           test.request.method !== "HEAD"
             ? test.request.body
             : undefined,
-        signal: AbortSignal.timeout(30_000),
+        signal: AbortSignal.timeout(DEFAULT_FETCH_TIMEOUT_MS),
       });
       const durationMs = Date.now() - started;
-      const bodyText = await res.text();
+      const rawBody = await res.text();
+      const truncated = truncateToBytes(rawBody, DEFAULT_MAX_RESPONSE_BYTES);
+      if (truncated.truncated) {
+        observations.notes.push(
+          `Response truncated at ${DEFAULT_MAX_RESPONSE_BYTES} bytes (was ${truncated.originalBytes})`,
+        );
+      }
       observations.http.status = captured(res.status);
       observations.http.headers = captured(headersFromFetch(res.headers));
-      observations.http.body = captured(bodyText);
-      observations.http.bodyEncoding = captured(bodyText.length === 0 ? "empty" : "utf8");
+      observations.http.body = captured(truncated.text);
+      observations.http.bodyEncoding = captured(
+        truncated.text.length === 0 ? "empty" : "utf8",
+      );
       observations.durationMs = captured(durationMs);
       observations.exception = captured(null);
       observations.runtime.platformHints = captured({
@@ -265,6 +271,13 @@ export class RemoteCloudflareExecutionTarget implements ExecutionTarget {
 
   async cleanup(): Promise<void> {
     if (!this.configured || !this.workerName) return;
+    for (const resource of this.owned) {
+      try {
+        assertOwnedResourceSafe(resource);
+      } catch {
+        continue;
+      }
+    }
     const del = await runWrangler(
       ["delete", this.workerName, "--force"],
       this.ctx.projectRoot,
