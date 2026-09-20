@@ -4,15 +4,18 @@
   "version": "0.1.0",
   "description": "EdgeMirror monorepo — production parity testing for Cloudflare Workers",
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "apps/*"
   ],
   "scripts": {
-    "build": "npm run build -w @edgemirror/cli && npm run build -w @edgemirror/vitest",
-    "test": "npm run test -w @edgemirror/cli",
+    "build": "npm run build -w @edgemirror/organizations && npm run build -w @edgemirror/billing && npm run build -w @edgemirror/api && npm run build -w @edgemirror/cli && npm run build -w @edgemirror/vitest",
+    "test": "npm run test:billing && npm run test -w @edgemirror/cli",
+    "test:billing": "npm run build -w @edgemirror/organizations && npm run build -w @edgemirror/billing && npm run test -w @edgemirror/organizations && npm run test -w @edgemirror/billing && npm run test -w @edgemirror/api",
     "test:unit": "npm run test:unit -w @edgemirror/cli",
     "lint": "npm run lint -w @edgemirror/cli",
     "edgemirror": "node packages/cli/dist/cli/bin.js",
-    "typecheck": "npm run typecheck -w @edgemirror/cli && npm run typecheck -w @edgemirror/vitest"
+    "api": "npm run start -w @edgemirror/api",
+    "typecheck": "npm run typecheck -w @edgemirror/organizations && npm run typecheck -w @edgemirror/billing && npm run typecheck -w @edgemirror/api && npm run typecheck -w @edgemirror/cli && npm run typecheck -w @edgemirror/vitest"
   },
   "engines": {
     "node": ">=20"
