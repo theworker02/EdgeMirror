@@ -9,6 +9,7 @@ import pc from "picocolors";
 import { discoverZeroConfig } from "../discovery/zeroconfig.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
 import { runVerify } from "../verify/index.js";
+import { formatBanner, formatSection, formatStatusBadge } from "./ux.js";
 
 export interface OnboardingMenuItem {
   key: string;
@@ -74,20 +75,15 @@ function isInteractive(): boolean {
 }
 
 function printBanner(discovery: ReturnType<typeof discoverZeroConfig>): void {
-  console.log("");
-  console.log(pc.bold(`EdgeMirror ${EDGEMIRROR_VERSION}`));
-  console.log(
-    pc.dim(
-      "Production parity for Cloudflare Workers — independent OSS, not affiliated with Cloudflare, Inc.",
-    ),
-  );
-  console.log("");
+  process.stdout.write(formatBanner());
   if (discovery.hasWrangler) {
     const name =
       discovery.worker?.fingerprint.workerName ??
       discovery.wranglerConfigPath ??
       "Worker project";
-    console.log(pc.green(`Detected Cloudflare Worker project: ${name}`));
+    console.log(
+      `${formatStatusBadge("VERIFIED")}  Detected Cloudflare Worker project: ${name}`,
+    );
     if (discovery.createCloudflare?.detected) {
       console.log(
         pc.dim(
@@ -97,16 +93,15 @@ function printBanner(discovery: ReturnType<typeof discoverZeroConfig>): void {
     }
   } else {
     console.log(
-      pc.yellow(
-        "No wrangler.json(c)/toml found here. Init a Worker project, or run from one.",
-      ),
+      `${formatStatusBadge("BLOCKED")}  No wrangler.json(c)/toml found here. Init a Worker project, or run from one.`,
     );
   }
   console.log("");
 }
 
 function printMenu(): void {
-  console.log(pc.bold("What would you like to do?"));
+  console.log(formatSection("What would you like to do?"));
+  console.log("");
   for (const item of ONBOARDING_MENU) {
     const suffix = item.safeLocal ? "" : pc.dim(" (may need CF credentials)");
     console.log(`  ${pc.cyan(item.key)}) ${item.label}${suffix}`);

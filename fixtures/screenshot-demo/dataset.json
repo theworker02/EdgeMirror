@@ -1,0 +1,37 @@
+{
+  "demo": true,
+  "label": "DEMO",
+  "warning": "Deterministic fixture for screenshots — NOT production metrics",
+  "findingId": "EM-DEMO-001",
+  "runId": "demo-screenshot-001",
+  "edgemirrorVersion": "0.1.0",
+  "remoteStatus": "DEMO synthesized (not live Cloudflare)",
+  "results": [
+    {
+      "findingId": "EM-DEMO-001",
+      "testId": "demo-http-get-root",
+      "classification": "POSSIBLE_RUNTIME_DIVERGENCE",
+      "productStatus": "DIVERGENT",
+      "confidence": 0.94,
+      "differences": [
+        {
+          "path": "http.body",
+          "local": "demo-local-ok",
+          "remote": "demo-remote-different"
+        }
+      ]
+    }
+  ],
+  "score": {
+    "overall": null,
+    "matched": 0,
+    "divergent": 1,
+    "insufficient": 0,
+    "remoteNotConfigured": 0,
+    "calculation": "DEMO fixture — score withheld"
+  },
+  "compatibility": [
+    { "date": "2024-11-11", "state": "ok" },
+    { "date": "2025-04-01", "state": "fail" }
+  ]
+}

@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EdgeMirror — Compatibility (DEMO)</title>
+  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/edgemirror.css" />
+</head>
+<body class="em-app">
+  <div class="em-shell">
+    <nav class="em-nav" aria-label="Primary">
+      <div class="em-nav__brand">
+        <img src="./img/icon.svg" alt="" width="28" height="28" />
+        <span>EdgeMirror</span>
+      </div>
+      <a href="./index.html">Overview</a>
+      <a href="./projects.html">Projects</a>
+      <a href="./runs.html">Runs</a>
+      <a href="./findings.html">Findings</a>
+      <a href="./compatibility.html" aria-current="page">Compatibility</a>
+      <a href="./supercharger.html">Supercharger</a>
+      <a href="./corpus.html">Corpus</a>
+      <a href="./billing.html">Billing</a>
+      <a href="./settings.html">Settings</a>
+    </nav>
+    <main class="em-main">
+      <div class="em-banner-demo" role="note">DEMO dataset — not production metrics</div>
+      <div>
+        <h1 class="em-page-title">Compatibility</h1>
+        <p class="em-page-sub">Compatibility-date matrix cells. DEMO shell only.</p>
+      </div>
+      <div id="compat" style="display:flex;gap:8px;flex-wrap:wrap"></div><script type="module">const d=await fetch("./demo-data.json").then(r=>r.json());document.getElementById("compat").innerHTML=d.compatibility.map(c=>`<span class="em-compat em-compat--${c.state}" title="${c.date}">${c.date}<br>${c.label}</span>`).join("")</script>
+    </main>
+  </div>
+</body>
+</html>

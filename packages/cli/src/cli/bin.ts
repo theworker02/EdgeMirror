@@ -15,6 +15,7 @@ import {
   registerPitchDemoCommand,
 } from "./commands/demo.js";
 import { runDefaultAction } from "./onboarding.js";
+import { formatError } from "./ux.js";
 
 const program = new Command();
 
@@ -30,7 +31,7 @@ program
     `
 ${pc.dim("EdgeMirror is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.")}
 
-Examples:
+${pc.bold("Examples")}
   edgemirror                 # interactive onboarding (TTY) or safe local verify
   edgemirror init
   edgemirror init --ci
@@ -47,6 +48,8 @@ Examples:
   edgemirror compat --dates 2024-11-11,2025-04-01
   edgemirror matrix --dates 2025-04-01
   edgemirror bundle EM-001
+
+${pc.bold("Status language")}  VERIFIED · DIVERGENT · RUNNING · UNKNOWN · STALE · BLOCKED · FAILED · DEMO
 `,
   );
 
@@ -106,11 +109,10 @@ async function main(): Promise<void> {
 
 main().catch((err: unknown) => {
   const message = err instanceof Error ? err.message : String(err);
-  console.error(pc.red(`Error: ${message}`));
-  if (err && typeof err === "object" && "hints" in err) {
-    for (const hint of (err as { hints: string[] }).hints) {
-      console.error(pc.dim(`  ${hint}`));
-    }
-  }
+  const hints =
+    err && typeof err === "object" && "hints" in err
+      ? (err as { hints: string[] }).hints
+      : [];
+  console.error(formatError(message, hints));
   process.exitCode = 2;
 });

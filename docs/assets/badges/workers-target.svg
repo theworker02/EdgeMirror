@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="20" role="img" aria-label="target Cloudflare Workers">
+  <rect width="48" height="20" fill="#0e1419"/>
+  <rect x="48" width="112" height="20" fill="#F38020"/>
+  <text x="6" y="14" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11" fill="#fff">target</text>
+  <text x="54" y="14" font-family="Verdana,DejaVu Sans,sans-serif" font-size="11" fill="#0e1419">CF Workers</text>
+</svg>

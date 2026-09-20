@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EdgeMirror — Runs (DEMO)</title>
+  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/edgemirror.css" />
+</head>
+<body class="em-app">
+  <div class="em-shell">
+    <nav class="em-nav" aria-label="Primary">
+      <div class="em-nav__brand">
+        <img src="./img/icon.svg" alt="" width="28" height="28" />
+        <span>EdgeMirror</span>
+      </div>
+      <a href="./index.html">Overview</a>
+      <a href="./projects.html">Projects</a>
+      <a href="./runs.html" aria-current="page">Runs</a>
+      <a href="./findings.html">Findings</a>
+      <a href="./compatibility.html">Compatibility</a>
+      <a href="./supercharger.html">Supercharger</a>
+      <a href="./corpus.html">Corpus</a>
+      <a href="./billing.html">Billing</a>
+      <a href="./settings.html">Settings</a>
+    </nav>
+    <main class="em-main">
+      <div class="em-banner-demo" role="note">DEMO dataset — not production metrics</div>
+      <div>
+        <h1 class="em-page-title">Runs</h1>
+        <p class="em-page-sub">Evidence runs with status vocabulary. DEMO shell only.</p>
+      </div>
+      <div id="runs" class="em-stack"></div><script type="module">const d=await fetch("./demo-data.json").then(r=>r.json());document.getElementById("runs").innerHTML=d.runs.map(r=>`<article class="em-finding"><div class="em-finding__head"><span class="em-finding__id">${r.id}</span><span class="em-status em-status--${r.status.toLowerCase()}">${r.status}</span></div><div class="em-finding__meta">${r.startedAt} · remote=${r.remoteStatus}</div></article>`).join("")</script>
+    </main>
+  </div>
+</body>
+</html>

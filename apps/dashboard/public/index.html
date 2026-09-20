@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EdgeMirror — Overview (DEMO)</title>
+  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./css/edgemirror.css" />
+</head>
+<body class="em-app">
+  <div class="em-shell">
+    <nav class="em-nav" aria-label="Primary">
+      <div class="em-nav__brand">
+        <img src="./img/icon.svg" alt="" width="28" height="28" />
+        <span>EdgeMirror</span>
+      </div>
+      <a href="./index.html" aria-current="page">Overview</a>
+      <a href="./projects.html">Projects</a>
+      <a href="./runs.html">Runs</a>
+      <a href="./findings.html">Findings</a>
+      <a href="./compatibility.html">Compatibility</a>
+      <a href="./supercharger.html">Supercharger</a>
+      <a href="./corpus.html">Corpus</a>
+      <a href="./billing.html">Billing</a>
+      <a href="./settings.html">Settings</a>
+    </nav>
+    <main class="em-main">
+      <div class="em-banner-demo" role="note">DEMO dataset — not production metrics</div>
+      <div>
+        <h1 class="em-page-title">Overview</h1>
+        <p class="em-page-sub">Local ↔ platform parity evidence. Independent OSS — not affiliated with Cloudflare.</p>
+      </div>
+      <div class="em-grid-metrics" id="metrics"></div>
+      <div class="em-stack">
+        <h2 class="em-page-title" style="font-size:16px">Latest DEMO finding</h2>
+        <div id="finding"></div>
+        <div id="diff"></div>
+      </div>
+    </main>
+  </div>
+  <script type="module">
+    const data = await fetch("./demo-data.json").then((r) => r.json());
+    const metrics = document.getElementById("metrics");
+    const mk = (label, value, hint) => {
+      const el = document.createElement("div");
+      el.className = "em-metric";
+      el.innerHTML = `<div class="em-metric__label">${label}</div><div class="em-metric__value">${value}</div>${hint ? `<div class="em-metric__hint">${hint}</div>` : ""}`;
+      return el;
+    };
+    metrics.append(
+      mk("Runs", String(data.overview.runs), "DEMO"),
+      mk("Verified", String(data.overview.verified), "DEMO"),
+      mk("Divergent", String(data.overview.divergent), "DEMO"),
+      mk("Blocked", String(data.overview.blocked), "DEMO"),
+    );
+    const f = data.findings[0];
+    document.getElementById("finding").innerHTML = `
+      <article class="em-finding" data-demo="true">
+        <div class="em-finding__head">
+          <span class="em-finding__id">${f.findingId}</span>
+          <span class="em-status em-status--demo">Demo</span>
+          <span class="em-status em-status--divergent">Divergent</span>
+        </div>
+        <div class="em-finding__meta">test=${f.testId} · classification=${f.classification} · conf=${f.confidence.toFixed(2)}</div>
+        <ul class="em-finding__diffs">${f.differences.map((d) => `<li><code>${d.path}</code> local=${JSON.stringify(d.local)} remote=${JSON.stringify(d.remote)}</li>`).join("")}</ul>
+      </article>`;
+    const d = f.differences[0];
+    document.getElementById("diff").innerHTML = `
+      <div class="em-diff">
+        <div class="em-diff__pane em-diff__pane--local"><div class="em-diff__label">Local</div>${d.local}</div>
+        <div class="em-diff__pane em-diff__pane--remote"><div class="em-diff__label">Remote (DEMO synthesized)</div>${d.remote}</div>
+      </div>`;
+  </script>
+</body>
+</html>

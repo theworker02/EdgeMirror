@@ -1,0 +1,66 @@
+{
+  "_comment": "DEMO screenshot dataset — NOT production metrics. finding IDs use EM-DEMO-*",
+  "demo": true,
+  "label": "DEMO",
+  "generatedFor": "screenshot / design polish only",
+  "project": {
+    "name": "demo-worker",
+    "compatibilityDate": "2025-04-01"
+  },
+  "overview": {
+    "runs": 3,
+    "verified": 1,
+    "divergent": 1,
+    "blocked": 1,
+    "note": "Counts are DEMO fixtures"
+  },
+  "runs": [
+    {
+      "id": "demo-run-001",
+      "status": "DIVERGENT",
+      "startedAt": "2026-09-19T12:00:00.000Z",
+      "score": null,
+      "remoteStatus": "DEMO synthesized"
+    },
+    {
+      "id": "demo-run-002",
+      "status": "VERIFIED",
+      "startedAt": "2026-09-19T11:00:00.000Z",
+      "score": 1,
+      "remoteStatus": "DEMO synthesized"
+    },
+    {
+      "id": "demo-run-003",
+      "status": "BLOCKED",
+      "startedAt": "2026-09-19T10:00:00.000Z",
+      "score": null,
+      "remoteStatus": "REMOTE_NOT_CONFIGURED"
+    }
+  ],
+  "findings": [
+    {
+      "findingId": "EM-DEMO-001",
+      "testId": "demo-http-get-root",
+      "classification": "POSSIBLE_RUNTIME_DIVERGENCE",
+      "status": "DIVERGENT",
+      "confidence": 0.94,
+      "differences": [
+        {
+          "path": "http.body",
+          "local": "demo-local-ok",
+          "remote": "demo-remote-different"
+        }
+      ]
+    }
+  ],
+  "compatibility": [
+    { "date": "2024-11-11", "state": "ok", "label": "ok" },
+    { "date": "2025-01-01", "state": "ok", "label": "ok" },
+    { "date": "2025-04-01", "state": "fail", "label": "Δ" }
+  ],
+  "supercharger": {
+    "note": "Visual stub only — no performance claims",
+    "gaugePct": 0,
+    "label": "Not connected"
+  }
+}

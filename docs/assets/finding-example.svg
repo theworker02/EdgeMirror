@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" role="img" aria-label="DEMO finding example">
+  <rect width="880" height="420" fill="#0c1116"/>
+  <rect x="24" y="24" width="832" height="36" fill="none" stroke="#c47ac0" stroke-dasharray="4 3"/>
+  <text x="40" y="47" font-family="IBM Plex Mono, monospace" font-size="13" fill="#c47ac0" letter-spacing="0.06em">DEMO DATASET - NOT PRODUCTION EVIDENCE</text>
+
+  <text x="40" y="100" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#e8eef2">Finding EM-DEMO-001</text>
+  <rect x="40" y="116" width="72" height="22" fill="none" stroke="#c47ac0"/><text x="52" y="131" font-family="IBM Plex Mono, monospace" font-size="11" fill="#c47ac0">DEMO</text>
+  <rect x="124" y="116" width="96" height="22" fill="none" stroke="#e07a6a"/><text x="136" y="131" font-family="IBM Plex Mono, monospace" font-size="11" fill="#e07a6a">DIVERGENT</text>
+
+  <text x="40" y="170" font-family="IBM Plex Mono, monospace" font-size="12" fill="#8a9aa6">classification=POSSIBLE_RUNTIME_DIVERGENCE · conf=0.94 · test=demo-http-get-root</text>
+
+  <rect x="40" y="200" width="380" height="160" fill="#141b22" stroke="#6aa3d8" stroke-width="2"/>
+  <text x="56" y="228" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8a9aa6" letter-spacing="0.05em">LOCAL</text>
+  <text x="56" y="268" font-family="IBM Plex Mono, monospace" font-size="14" fill="#e8eef2">http.body</text>
+  <text x="56" y="300" font-family="IBM Plex Mono, monospace" font-size="14" fill="#6aa3d8">"demo-local-ok"</text>
+
+  <rect x="460" y="200" width="380" height="160" fill="#141b22" stroke="#d4a574" stroke-width="2"/>
+  <text x="476" y="228" font-family="IBM Plex Mono, monospace" font-size="11" fill="#8a9aa6" letter-spacing="0.05em">REMOTE (DEMO SYNTHESIZED)</text>
+  <text x="476" y="268" font-family="IBM Plex Mono, monospace" font-size="14" fill="#e8eef2">http.body</text>
+  <text x="476" y="300" font-family="IBM Plex Mono, monospace" font-size="14" fill="#d4a574">"demo-remote-different"</text>
+</svg>
