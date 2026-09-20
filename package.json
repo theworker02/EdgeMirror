@@ -10,6 +10,7 @@
     "build": "npm run build -w @edgemirror/cli && npm run build -w @edgemirror/vitest",
     "test": "npm run test -w @edgemirror/cli",
     "test:unit": "npm run test:unit -w @edgemirror/cli",
+    "test:cloudflare-live": "npm run test:cloudflare-live -w @edgemirror/cli",
     "lint": "npm run lint -w @edgemirror/cli",
     "edgemirror": "node packages/cli/dist/cli/bin.js",
     "typecheck": "npm run typecheck -w @edgemirror/cli && npm run typecheck -w @edgemirror/vitest"
