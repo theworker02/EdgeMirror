@@ -18,6 +18,11 @@ export interface PackageJsonShape {
   optionalDependencies?: Record<string, string>;
 }
 
+export interface CreateCloudflareSignals {
+  detected: boolean;
+  signals: string[];
+}
+
 export interface ZeroConfigDiscovery {
   projectRoot: string;
   hasWrangler: boolean;
@@ -25,6 +30,8 @@ export interface ZeroConfigDiscovery {
   packageJsonPath?: string;
   packageManager: "npm" | "pnpm" | "yarn" | "bun" | "unknown";
   worker?: DiscoveredProject;
+  /** Heuristics for create-cloudflare / C3 / Workers starter layouts */
+  createCloudflare: CreateCloudflareSignals;
   vitest: {
     detected: boolean;
     configPath?: string;
@@ -127,6 +134,53 @@ function hasCloudflareAuthEnv(): boolean {
 }
 
 /**
+ * Detect create-cloudflare (C3) / Workers starter layouts without requiring network.
+ */
+export function detectCreateCloudflare(
+  root: string,
+  pkg?: PackageJsonShape,
+  hasWrangler = false,
+): CreateCloudflareSignals {
+  const signals: string[] = [];
+  const deps = {
+    ...pkg?.dependencies,
+    ...pkg?.devDependencies,
+    ...pkg?.optionalDependencies,
+  };
+  if (deps?.["wrangler"]) signals.push("dep:wrangler");
+  if (deps?.["@cloudflare/workers-types"])
+    signals.push("dep:@cloudflare/workers-types");
+  if (deps?.["@cloudflare/workers-types".toString()]) {
+    /* already covered */
+  }
+  if (deps?.["@cloudflare/vitest-pool-workers"])
+    signals.push("dep:@cloudflare/vitest-pool-workers");
+  if (deps?.["hono"] && hasWrangler) signals.push("dep:hono+wrangler");
+
+  const scripts = pkg?.scripts ?? {};
+  for (const [name, cmd] of Object.entries(scripts)) {
+    if (/wrangler\s+dev|wrangler\s+deploy|wrangler\s+versions/.test(cmd)) {
+      signals.push(`script:${name}`);
+    }
+  }
+
+  if (existsSync(join(root, ".wrangler"))) signals.push("dir:.wrangler");
+  if (existsSync(join(root, "worker-configuration.d.ts")))
+    signals.push("file:worker-configuration.d.ts");
+  if (existsSync(join(root, "public")) && hasWrangler)
+    signals.push("layout:public+wrangler");
+  // C3 often leaves a comment or name pattern
+  if (pkg?.name && /worker|workers|cf-|cloudflare/i.test(pkg.name)) {
+    signals.push("package-name:workers-ish");
+  }
+
+  return {
+    detected: hasWrangler || signals.length >= 2,
+    signals: [...new Set(signals)],
+  };
+}
+
+/**
  * Discover a project without requiring wrangler (for verify zero-config UX).
  * When wrangler is present, also attach full worker discovery.
  */
@@ -214,6 +268,8 @@ export function discoverZeroConfig(cwd = process.cwd()): ZeroConfigDiscovery {
     },
   ];
 
+  const createCloudflare = detectCreateCloudflare(root, pkg, hasWrangler);
+
   return {
     projectRoot: worker?.projectRoot ?? root,
     hasWrangler,
@@ -221,6 +277,7 @@ export function discoverZeroConfig(cwd = process.cwd()): ZeroConfigDiscovery {
     packageJsonPath,
     packageManager: detectPackageManager(root),
     worker,
+    createCloudflare,
     vitest,
     vite: {
       detected: Boolean(viteConfig) || Boolean(pkg?.devDependencies?.vite),

@@ -117,6 +117,8 @@ describe("zero-config discovery", () => {
     expect(zc.vitest.detected).toBe(true);
     expect(zc.hasWrangler).toBe(true);
     expect(zc.inferredChecks.some((c) => c.id === "remote-parity")).toBe(true);
+    expect(zc.createCloudflare).toBeDefined();
+    expect(zc.createCloudflare.detected).toBe(true);
     rmSync(dir, { recursive: true, force: true });
   });
 });
