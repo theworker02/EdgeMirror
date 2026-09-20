@@ -8,6 +8,8 @@
 
 Production confidence for Cloudflare Workers — does this app behave the same locally as on the real Cloudflare platform?
 
+**Live Cloudflare demo (static):** [theworker02.github.io/EdgeMirror](https://theworker02.github.io/EdgeMirror/)
+
 ```bash
 npx edgemirror verify
 ```
@@ -108,8 +110,9 @@ Dashboard UI (when present) is likewise **DEMO-labeled** — do not treat screen
 | `init --ci` / `--github` | Works |
 | GitHub Action scaffold | Works |
 | `@edgemirror/vitest` | Thin reporter — does not replace Vitest |
-| Supercharger | **Not shipped** — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) |
-| Hosted EdgeMirror Cloud | **Not shipped** |
+| Supercharger | CU budget selects different work packages — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) |
+| Hosted EdgeMirror Cloud | Catalog/scripts ready; Stripe test catalog + Checkout when keys configured |
+| GitHub Pages demo | Static Cloudflare pitch landing in `site/` |
 
 ## Commands (validated CLI)
 

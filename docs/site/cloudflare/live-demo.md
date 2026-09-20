@@ -1,19 +1,22 @@
 # Live Cloudflare demo
 
-Commands below ship on branch `agent/cloudflare` and require Agent 6 merge before they exist on `main` / docs baseline `88dd111`.
+Static landing (GitHub Pages): https://theworker02.github.io/EdgeMirror/
 
 ```bash
-edgemirror pitch-demo
+# from repo root after build
+node packages/cli/dist/cli/bin.js pitch-demo
 # equivalent:
-edgemirror demo cloudflare
+node packages/cli/dist/cli/bin.js demo cloudflare
 
-edgemirror demo reset   # ownership-safe cleanup; needs credentials
+node packages/cli/dist/cli/bin.js demo reset   # ownership-safe cleanup; needs credentials
 ```
 
 Target: under five minutes for a technical meeting — real local execution, optional preview, labeled controlled divergence, evidence bundle. DEMO/pitch findings stay isolated from real corpora.
 
-Offline DEMO (available on docs baseline):
+Without Cloudflare credentials, preview reports `REMOTE_NOT_CONFIGURED` — never fabricated.
+
+Offline DEMO (no Cloudflare):
 
 ```bash
-edgemirror demo
+node packages/cli/dist/cli/bin.js demo
 ```

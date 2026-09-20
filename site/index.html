@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EdgeMirror — Cloudflare Workers live demo</title>
+    <meta
+      name="description"
+      content="Know before you deploy. Real local workerd vs Cloudflare preview parity — evidence, not vibes. Independent of Cloudflare, Inc."
+    />
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="atmosphere" aria-hidden="true"></div>
+
+    <header class="top">
+      <a class="brand-link" href="./" aria-label="EdgeMirror home">
+        <img src="./assets/logo.svg" alt="EdgeMirror" width="200" height="34" />
+      </a>
+      <nav class="top-nav">
+        <a href="#run">Run the demo</a>
+        <a href="#honest">Honesty</a>
+        <a href="https://github.com/theworker02/EdgeMirror">GitHub</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="hero-brand">
+        <div class="hero-copy">
+          <p class="eyebrow">Cloudflare Workers · live pitch</p>
+          <h1 id="hero-brand" class="brand-display">EdgeMirror</h1>
+          <p class="lede">
+            Same request. Local workerd on the left. Real Cloudflare preview on
+            the right. Diffed with evidence — never inventing remote results.
+          </p>
+          <div class="cta-row">
+            <a class="cta primary" href="#run">Run pitch-demo</a>
+            <a
+              class="cta ghost"
+              href="https://github.com/theworker02/EdgeMirror"
+              >View source</a
+            >
+          </div>
+        </div>
+        <div class="hero-visual" aria-hidden="true">
+          <div class="mirror-plane">
+            <div class="pane local">
+              <span class="pane-label">local</span>
+              <code>pitch-local-ok</code>
+            </div>
+            <div class="mirror-edge"></div>
+            <div class="pane remote">
+              <span class="pane-label">preview</span>
+              <code>pitch-remote-divergent</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="terminal-section" aria-labelledby="term-heading">
+        <h2 id="term-heading">Captured from a real run</h2>
+        <p class="section-lede">
+          Static replay of <code>edgemirror pitch-demo</code> against a throwaway
+          Worker — local verified, Cloudflare preview verified, controlled
+          divergence labeled.
+        </p>
+        <div class="terminal" id="terminal" role="region" aria-live="polite">
+          <div class="terminal-chrome">
+            <span></span><span></span><span></span>
+            <em>edgemirror pitch-demo</em>
+          </div>
+          <pre id="term-out" class="terminal-body"></pre>
+        </div>
+      </section>
+
+      <section class="run" id="run" aria-labelledby="run-heading">
+        <h2 id="run-heading">Run it yourself</h2>
+        <p class="section-lede">
+          CLI-first. Under five minutes with Wrangler auth. Without credentials,
+          remote stays <code>REMOTE_NOT_CONFIGURED</code> — honest, not fake.
+        </p>
+        <ol class="steps">
+          <li>
+            <strong>Clone</strong>
+            <pre><code>git clone https://github.com/theworker02/EdgeMirror.git
+cd EdgeMirror && npm install && npm run build</code></pre>
+          </li>
+          <li>
+            <strong>Optional Cloudflare login</strong>
+            <pre><code>npx wrangler login</code></pre>
+          </li>
+          <li>
+            <strong>Live Cloudflare pitch</strong>
+            <pre><code>node packages/cli/dist/cli/bin.js pitch-demo
+# or:  node packages/cli/dist/cli/bin.js demo cloudflare</code></pre>
+          </li>
+        </ol>
+      </section>
+
+      <section class="honest" id="honest" aria-labelledby="honest-heading">
+        <h2 id="honest-heading">What this demo proves</h2>
+        <ul class="proof-list">
+          <li>
+            <strong>Real local workerd</strong> — not a mocked HTTP stub.
+          </li>
+          <li>
+            <strong>Real Cloudflare preview</strong> when logged in — throwaway
+            <code>edgemirror-tmp-*</code> Workers, cleaned up after.
+          </li>
+          <li>
+            <strong>Labeled divergence</strong> — pitch rewrites the remote body
+            on purpose so the meeting sees a finding, not silent MATCH theater.
+          </li>
+          <li>
+            <strong>No invented parity</strong> — missing auth →
+            <code>REMOTE_NOT_CONFIGURED</code>, never a fabricated remote trace.
+          </li>
+        </ul>
+        <p class="disclaimer">
+          EdgeMirror is an independent open-source project and is
+          <strong>not affiliated with, endorsed by, or sponsored by Cloudflare,
+          Inc.</strong>
+        </p>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <img src="./assets/wordmark.svg" alt="" width="120" height="20" />
+      <span>Apache-2.0 · <a href="https://github.com/theworker02/EdgeMirror">theworker02/EdgeMirror</a></span>
+    </footer>
+
+    <script src="./demo.js" defer></script>
+  </body>
+</html>
