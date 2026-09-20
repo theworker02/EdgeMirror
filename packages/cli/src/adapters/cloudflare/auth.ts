@@ -60,22 +60,36 @@ export function detectCloudflareAuth(): CloudflareAuthStatus {
   }
 
   const home = process.env.USERPROFILE ?? process.env.HOME;
-  if (home) {
-    const candidates = [
-      join(home, ".wrangler", "config", "default.toml"),
-      join(home, ".config", ".wrangler", "config", "default.toml"),
-    ];
-    if (candidates.some((p) => existsSync(p))) {
-      return {
-        mode: "wrangler_oauth",
-        label: "wrangler OAuth config detected (may be expired)",
-        configured: true,
-        accountIdPresent,
-        hints: [
-          "OAuth sessions can expire. Prefer CLOUDFLARE_API_TOKEN for CI.",
-        ],
-      };
-    }
+  const appData = process.env.APPDATA;
+  const candidates = [
+    home ? join(home, ".wrangler", "config", "default.toml") : "",
+    home ? join(home, ".config", ".wrangler", "config", "default.toml") : "",
+    // Windows Wrangler / XDG-style store (observed after `wrangler login`)
+    appData
+      ? join(appData, "xdg.config", ".wrangler", "config", "default.toml")
+      : "",
+    home
+      ? join(
+          home,
+          "AppData",
+          "Roaming",
+          "xdg.config",
+          ".wrangler",
+          "config",
+          "default.toml",
+        )
+      : "",
+  ].filter(Boolean);
+  if (candidates.some((p) => existsSync(p))) {
+    return {
+      mode: "wrangler_oauth",
+      label: "wrangler OAuth config detected (may be expired)",
+      configured: true,
+      accountIdPresent,
+      hints: [
+        "OAuth sessions can expire. Prefer CLOUDFLARE_API_TOKEN for CI.",
+      ],
+    };
   }
 
   return {
