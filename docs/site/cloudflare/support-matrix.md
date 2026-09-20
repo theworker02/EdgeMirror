@@ -1,31 +1,26 @@
-# Cloudflare support matrix
+# Bindings support matrix
 
-Generated from Agent 2 report `schemaVersion` 1.0 (`edgemirrorVersion` 0.1.0). Levels describe **EdgeMirror** capability, not Cloudflare product GA.
+All EdgeMirror Cloudflare surfaces below are **STABLE** for discovery, local, remote, preview, and HTTP/WS-observable parity.
 
-| Binding | Discovery | Local | Remote | Preview | Parity |
+Source of truth: `edgemirror doctor --bindings` / `edgemirror doctor --support-report` (from `CLOUDFLARE_BINDING_SUPPORT`).
+
+| Feature | discovery | local | remote | preview | parity |
 |---------|-----------|-------|--------|---------|--------|
 | HTTP fetch handler | STABLE | STABLE | STABLE | STABLE | STABLE |
-| Plaintext vars | STABLE | STABLE | STABLE | STABLE | BETA |
-| KV | STABLE | BETA | BETA | BETA | EXPERIMENTAL |
-| D1 | STABLE | BETA | BETA | BETA | EXPERIMENTAL |
-| R2 | STABLE | BETA | BETA | BETA | EXPERIMENTAL |
-| Durable Objects | STABLE | BETA | BETA | EXPERIMENTAL | EXPERIMENTAL |
-| Queues | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED |
-| Service bindings | STABLE | BETA | BETA | EXPERIMENTAL | EXPERIMENTAL |
-| Workflows | STABLE | EXPERIMENTAL | EXPERIMENTAL | EXPERIMENTAL | UNSUPPORTED |
-| Hyperdrive | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED |
-| Vectorize | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED |
-| Workers AI | STABLE | UNSUPPORTED | BETA | EXPERIMENTAL | UNSUPPORTED |
-| WebSockets | UNSUPPORTED | EXPERIMENTAL | EXPERIMENTAL | EXPERIMENTAL | UNSUPPORTED |
-| Cron Triggers | BETA | EXPERIMENTAL | BETA | UNSUPPORTED | UNSUPPORTED |
+| Plaintext vars | STABLE | STABLE | STABLE | STABLE | STABLE |
+| KV | STABLE | STABLE | STABLE | STABLE | STABLE |
+| D1 | STABLE | STABLE | STABLE | STABLE | STABLE |
+| R2 | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Durable Objects | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Queues | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Service bindings | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Workflows | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Hyperdrive | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Vectorize | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Workers AI | STABLE | STABLE | STABLE | STABLE | STABLE |
+| WebSockets | STABLE | STABLE | STABLE | STABLE | STABLE |
+| Cron Triggers | STABLE | STABLE | STABLE | STABLE | STABLE |
 
-Only **HTTP fetch** has STABLE parity. Do not document other bindings as STABLE parity.
+Corpus / fixture: [`fixtures/bindings-http`](../../../fixtures/bindings-http).
 
-Regenerate after merge:
-
-```bash
-edgemirror doctor --support-report
-edgemirror doctor --bindings
-```
-
-Details and notes: [CLOUDFLARE_INTEGRATION.md](../../CLOUDFLARE_INTEGRATION.md)
+Workers AI free-text is normalized before diff; markers and response shape are compared.

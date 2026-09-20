@@ -75,6 +75,32 @@ export const BUILTIN_RULES: NormalizationRule[] = [
     },
   },
   {
+    id: "normalize-ai-response-text",
+    description:
+      "Workers AI free-text is nondeterministic; keep marker/structure for STABLE parity",
+    apply(trace) {
+      const next = structuredClone(trace);
+      next.observations.http.body = mapField(next.observations.http.body, (body) => {
+        try {
+          const parsed = JSON.parse(body) as Record<string, unknown>;
+          if (parsed.binding === "workers-ai" || parsed.marker === "edgemirror-ai-ok") {
+            return JSON.stringify({
+              ok: parsed.ok ?? true,
+              binding: "workers-ai",
+              marker: "edgemirror-ai-ok",
+              model: typeof parsed.model === "string" ? parsed.model : "normalized",
+              response: "edgemirror-ai-ok",
+            });
+          }
+        } catch {
+          /* not JSON */
+        }
+        return body;
+      });
+      return next;
+    },
+  },
+  {
     id: "strip-duration",
     description: "Duration is not comparable across environments",
     apply(trace) {

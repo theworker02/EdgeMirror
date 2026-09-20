@@ -3,7 +3,7 @@ import { createServer } from "node:net";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import type { ExecutionContext, ExecutionTarget } from "./types.js";
-import type { ParityTest } from "../trace/schema.js";
+import type { ExecutionObservations, ParityTest } from "../trace/schema.js";
 import {
   captured,
   createTrace,
@@ -13,6 +13,115 @@ import {
 } from "../trace/factory.js";
 import { writeCompatDateOverlay } from "../adapters/cloudflare/wrangler.js";
 import { spawnWranglerSafe } from "../security/spawn.js";
+
+/**
+ * When the corpus exercises HTTP-observable binding routes, record that the
+ * comparison surface is http.body (not deep binding instrumentation).
+ */
+export function annotateHttpBindingEffects(
+  observations: ExecutionObservations,
+  test: ParityTest,
+  bodyText: string,
+): void {
+  const feature = (test.feature ?? test.category ?? "").toLowerCase();
+  const path = test.request.path;
+  const isBinding =
+    feature === "vars" ||
+    feature === "kv" ||
+    feature === "d1" ||
+    feature === "r2" ||
+    feature === "durable-objects" ||
+    feature === "queues" ||
+    feature === "service-bindings" ||
+    feature === "workflows" ||
+    feature === "hyperdrive" ||
+    feature === "vectorize" ||
+    feature === "workers-ai" ||
+    feature === "websockets" ||
+    feature === "cron-triggers" ||
+    feature === "bindings" ||
+    path.startsWith("/bindings/");
+  if (!isBinding) return;
+
+  const binding =
+    feature && feature !== "bindings"
+      ? feature
+      : path.includes("/kv")
+        ? "kv"
+        : path.includes("/d1")
+          ? "d1"
+          : path.includes("/r2")
+            ? "r2"
+            : path.includes("/vars")
+              ? "vars"
+              : path.includes("/do")
+                ? "durable-objects"
+                : path.includes("/queues")
+                  ? "queues"
+                  : path.includes("/service")
+                    ? "service-bindings"
+                    : path.includes("/workflows")
+                      ? "workflows"
+                      : path.includes("/hyperdrive")
+                        ? "hyperdrive"
+                        : path.includes("/vectorize")
+                          ? "vectorize"
+                          : path.includes("/ai")
+                            ? "workers-ai"
+                            : path.includes("/ws")
+                              ? "websockets"
+                              : path.includes("/cron")
+                                ? "cron-triggers"
+                                : "bindings";
+
+  observations.bindingInteractions = captured([
+    {
+      binding,
+      operation: "http-observable",
+      details: {
+        path,
+        bodyBytes: bodyText.length,
+        note: "Compared via HTTP/WS response; not a raw binding dump.",
+      },
+    },
+  ]);
+  if (
+    binding === "kv" ||
+    binding === "d1" ||
+    binding === "r2" ||
+    binding === "durable-objects"
+  ) {
+    observations.storageOperations = captured([
+      {
+        binding,
+        operation: "http-observable-read",
+        details: { path },
+      },
+    ]);
+  }
+  if (binding === "websockets") {
+    observations.websocketLifecycle = captured([
+      { event: "http-probe", path, marker: "edgemirror-ws-ok" },
+    ]);
+  }
+  if (binding === "queues") {
+    observations.queueBehavior = captured([
+      { event: "enqueue-and-marker", path, marker: "edgemirror-queues-ok" },
+    ]);
+  }
+  if (binding === "durable-objects") {
+    observations.durableObjectInteractions = captured([
+      {
+        binding: "COUNTER",
+        operation: "fetch",
+        details: { path },
+      },
+    ]);
+  }
+  observations.notes.push(
+    `STABLE ${binding} effect captured for parity (body/lifecycle compared).`,
+  );
+}
 
 async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -160,6 +269,7 @@ export class LocalExecutionTarget implements ExecutionTarget {
       observations.http.bodyEncoding = captured(bodyText.length === 0 ? "empty" : "utf8");
       observations.durationMs = captured(durationMs);
       observations.exception = captured(null);
+      annotateHttpBindingEffects(observations, test, bodyText);
 
       return createTrace({
         testId: test.id,

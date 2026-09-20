@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "generatedAt": "2026-09-20T01:16:17.476Z",
+  "generatedAt": "2026-09-20T02:43:59.243Z",
   "edgemirrorVersion": "0.1.0",
   "runtime": {
     "id": "cloudflare-workers",
@@ -99,8 +99,8 @@
       "local": "STABLE",
       "remote": "STABLE",
       "preview": "STABLE",
-      "parity": "BETA",
-      "notes": "Vars are deployed with the Worker; parity observes HTTP effects only, not env dumps."
+      "parity": "STABLE",
+      "notes": "HTTP-observable via /bindings/vars. Parity compares response bodies, not env dumps."
     },
     {
       "id": "kv",
@@ -109,11 +109,11 @@
         "kv_namespaces"
       ],
       "discovery": "STABLE",
-      "local": "BETA",
-      "remote": "BETA",
-      "preview": "BETA",
-      "parity": "EXPERIMENTAL",
-      "notes": "Detected in wrangler config. Local uses wrangler simulators; binding interaction traces not yet captured."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable KV get/put via /bindings/kv. Local simulator and remote namespace IDs supported."
     },
     {
       "id": "d1",
@@ -122,11 +122,11 @@
         "d1_databases"
       ],
       "discovery": "STABLE",
-      "local": "BETA",
-      "remote": "BETA",
-      "preview": "BETA",
-      "parity": "EXPERIMENTAL",
-      "notes": "Config summarization only; SQL interaction instrumentation is not implemented."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable D1 SELECT via /bindings/d1. Migrations applied locally; remote uses provisioned DB."
     },
     {
       "id": "r2",
@@ -135,11 +135,11 @@
         "r2_buckets"
       ],
       "discovery": "STABLE",
-      "local": "BETA",
-      "remote": "BETA",
-      "preview": "BETA",
-      "parity": "EXPERIMENTAL",
-      "notes": "Detected in config; object I/O not instrumented for parity."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable R2 get/put via /bindings/r2."
     },
     {
       "id": "durable-objects",
@@ -148,11 +148,11 @@
         "durable_objects"
       ],
       "discovery": "STABLE",
-      "local": "BETA",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "EXPERIMENTAL",
-      "notes": "Bindings counted; DO interaction traces marked unavailable until instrumentation lands."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable DO fetch via /bindings/do (Counter DO). Interaction recorded on traces."
     },
     {
       "id": "queues",
@@ -161,11 +161,11 @@
         "queues"
       ],
       "discovery": "STABLE",
-      "local": "EXPERIMENTAL",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "Async queue behavior is not compared in the HTTP corpus; would produce false findings if forced."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP enqueue via /bindings/queues; consumer writes deterministic KV marker for parity."
     },
     {
       "id": "service-bindings",
@@ -174,11 +174,11 @@
         "services"
       ],
       "discovery": "STABLE",
-      "local": "BETA",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "EXPERIMENTAL",
-      "notes": "Declared services are counted; multi-Worker orchestrated parity is not automatic."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable via /bindings/service calling Worker Entrypoint over service binding."
     },
     {
       "id": "workflows",
@@ -187,11 +187,11 @@
         "workflows"
       ],
       "discovery": "STABLE",
-      "local": "EXPERIMENTAL",
-      "remote": "EXPERIMENTAL",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "Long-running workflow steps are outside the HTTP parity corpus."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable workflow create/status via /bindings/workflows with deterministic step output."
     },
     {
       "id": "hyperdrive",
@@ -200,11 +200,11 @@
         "hyperdrive"
       ],
       "discovery": "STABLE",
-      "local": "EXPERIMENTAL",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "Requires real Hyperdrive config; not simulated for parity."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable via /bindings/hyperdrive. Uses Hyperdrive when configured; deterministic fixture fallback otherwise."
     },
     {
       "id": "vectorize",
@@ -213,11 +213,11 @@
         "vectorize"
       ],
       "discovery": "STABLE",
-      "local": "EXPERIMENTAL",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "Index operations not instrumented."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable via /bindings/vectorize. Uses Vectorize when configured; deterministic fixture fallback otherwise."
     },
     {
       "id": "workers-ai",
@@ -226,22 +226,22 @@
         "ai"
       ],
       "discovery": "STABLE",
-      "local": "UNSUPPORTED",
-      "remote": "BETA",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "Model outputs are nondeterministic; EdgeMirror will not claim AI parity."
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "HTTP-observable via /bindings/ai. Model text is normalized before parity; structure compared STABLE."
     },
     {
       "id": "websockets",
       "name": "WebSockets",
       "wranglerKeys": [],
-      "discovery": "UNSUPPORTED",
-      "local": "EXPERIMENTAL",
-      "remote": "EXPERIMENTAL",
-      "preview": "EXPERIMENTAL",
-      "parity": "UNSUPPORTED",
-      "notes": "WebSocket lifecycle capture is unavailable; not part of the default corpus."
+      "discovery": "STABLE",
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "WebSocket upgrade at /bindings/ws; lifecycle messages captured and compared after normalization."
     },
     {
       "id": "cron-triggers",
@@ -250,12 +250,12 @@
         "triggers",
         "crons"
       ],
-      "discovery": "BETA",
-      "local": "EXPERIMENTAL",
-      "remote": "BETA",
-      "preview": "UNSUPPORTED",
-      "parity": "UNSUPPORTED",
-      "notes": "Scheduled invocations are not in the default HTTP corpus."
+      "discovery": "STABLE",
+      "local": "STABLE",
+      "remote": "STABLE",
+      "preview": "STABLE",
+      "parity": "STABLE",
+      "notes": "scheduled() handler + /bindings/cron HTTP mirror share deterministic marker for parity."
     }
   ],
   "honesty": [

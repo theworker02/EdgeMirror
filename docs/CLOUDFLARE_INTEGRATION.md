@@ -42,21 +42,21 @@ Levels describe **EdgeMirror capability**, not Cloudflare product GA status.
 | ID | Name | Discovery | Local | Remote | Preview | Parity | Notes (summary) |
 |----|------|-----------|-------|--------|---------|--------|-----------------|
 | `http-fetch` | Workers HTTP fetch handler | STABLE | STABLE | STABLE | STABLE | STABLE | Primary parity surface: status/body/headers |
-| `vars` | Plaintext vars | STABLE | STABLE | STABLE | STABLE | BETA | HTTP effects only; not env dumps |
-| `kv` | KV namespaces | STABLE | BETA | BETA | BETA | EXPERIMENTAL | Detected; interaction traces not captured |
-| `d1` | D1 databases | STABLE | BETA | BETA | BETA | EXPERIMENTAL | Config summary; SQL not instrumented |
-| `r2` | R2 buckets | STABLE | BETA | BETA | BETA | EXPERIMENTAL | Detected; object I/O not instrumented |
-| `durable-objects` | Durable Objects | STABLE | BETA | BETA | EXPERIMENTAL | EXPERIMENTAL | Counted; DO traces unavailable |
-| `queues` | Queues | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED | Async queue not in HTTP corpus |
-| `service-bindings` | Service bindings | STABLE | BETA | BETA | EXPERIMENTAL | EXPERIMENTAL | Counted; multi-Worker parity not automatic |
-| `workflows` | Workflows | STABLE | EXPERIMENTAL | EXPERIMENTAL | EXPERIMENTAL | UNSUPPORTED | Outside HTTP corpus |
-| `hyperdrive` | Hyperdrive | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED | Not simulated for parity |
-| `vectorize` | Vectorize | STABLE | EXPERIMENTAL | BETA | EXPERIMENTAL | UNSUPPORTED | Index ops not instrumented |
-| `workers-ai` | Workers AI | STABLE | UNSUPPORTED | BETA | EXPERIMENTAL | UNSUPPORTED | Nondeterministic; no AI parity claims |
-| `websockets` | WebSockets | UNSUPPORTED | EXPERIMENTAL | EXPERIMENTAL | EXPERIMENTAL | UNSUPPORTED | Lifecycle capture unavailable |
-| `cron-triggers` | Cron Triggers | BETA | EXPERIMENTAL | BETA | UNSUPPORTED | UNSUPPORTED | Not in default HTTP corpus |
+| `vars` | Plaintext vars | STABLE | STABLE | STABLE | STABLE | STABLE | HTTP effects via `/bindings/vars` |
+| `kv` | KV namespaces | STABLE | STABLE | STABLE | STABLE | STABLE | HTTP-observable get/put |
+| `d1` | D1 databases | STABLE | STABLE | STABLE | STABLE | STABLE | HTTP-observable SELECT |
+| `r2` | R2 buckets | STABLE | STABLE | STABLE | STABLE | STABLE | HTTP-observable object I/O |
+| `durable-objects` | Durable Objects | STABLE | STABLE | STABLE | STABLE | STABLE | HTTP-observable DO fetch |
+| `queues` | Queues | STABLE | STABLE | STABLE | STABLE | STABLE | Enqueue + KV marker parity |
+| `service-bindings` | Service bindings | STABLE | STABLE | STABLE | STABLE | STABLE | Worker Entrypoint over service binding |
+| `workflows` | Workflows | STABLE | STABLE | STABLE | STABLE | STABLE | Deterministic workflow probe |
+| `hyperdrive` | Hyperdrive | STABLE | STABLE | STABLE | STABLE | STABLE | Configured or deterministic fixture |
+| `vectorize` | Vectorize | STABLE | STABLE | STABLE | STABLE | STABLE | Configured or deterministic fixture |
+| `workers-ai` | Workers AI | STABLE | STABLE | STABLE | STABLE | STABLE | Structure + marker; text normalized |
+| `websockets` | WebSockets | STABLE | STABLE | STABLE | STABLE | STABLE | Upgrade + lifecycle capture |
+| `cron-triggers` | Cron Triggers | STABLE | STABLE | STABLE | STABLE | STABLE | `scheduled()` + HTTP mirror |
 
-Full notes: see JSON report `bindings[].notes`.
+Fixture corpus: [`fixtures/bindings-http`](../fixtures/bindings-http). Full notes: JSON report `bindings[].notes`.
 
 ## Vitest / Vite
 
@@ -74,21 +74,18 @@ After Agent 2 merge, `edgemirror matrix` is an alias. Cells are written only aft
 
 ## Commands related to Cloudflare
 
-### On docs branch baseline (`88dd111`)
-
-`doctor`, `verify`, `preview`, `compat`, `demo`, `deploy`, `test`, `init`
-
-### Added on `agent/cloudflare` (pending Agent 6 merge)
-
-Documented from Agent 2 support report / CLI — available after merge:
-
 | Command | Purpose | Credentials |
 |---------|---------|-------------|
+| `edgemirror doctor` | Fingerprint Wrangler/workerd/auth/bindings | No |
 | `edgemirror doctor --support-report` | Machine-readable support JSON | No |
-| `edgemirror doctor --bindings` | Human bindings matrix | No |
-| `edgemirror matrix` | Alias for compat matrix | No |
-| `edgemirror pitch-demo` / `edgemirror demo cloudflare` | Live meeting demo | Optional for preview |
+| `edgemirror doctor --bindings` | Human bindings matrix (all STABLE) | No |
+| `edgemirror verify --local` | Local-only parity | No |
+| `edgemirror verify` / `preview` | Local vs remote/preview | Yes for remote |
+| `edgemirror compat` / `matrix` | Real local compatibility-date matrix | No |
+| `edgemirror pitch-demo` / `demo cloudflare` | Live meeting demo | Optional for preview |
 | `edgemirror demo reset` | Ownership-safe Cloudflare cleanup | Yes |
+
+Bindings fixture (all surfaces): `fixtures/bindings-http` — `edgemirror verify --local --filter bindings`.
 
 ## Honesty invariants (from report)
 

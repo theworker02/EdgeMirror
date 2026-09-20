@@ -1,8 +1,6 @@
 # EdgeMirror
 
-<p align="center">
-  <img src="./branding/assets/logo.svg" alt="EdgeMirror" width="280" />
-</p>
+![EdgeMirror](./branding/assets/logo.svg)
 
 **Know before you deploy.**
 
@@ -16,16 +14,14 @@ npx edgemirror verify
 
 EdgeMirror is an independent open-source project and is **not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.**
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-0e1419?style=flat-square)](./LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D20-1a7a6d?style=flat-square)](./package.json)
-[![Cloudflare Workers](https://img.shields.io/badge/target-Cloudflare%20Workers-F38020?style=flat-square&labelColor=0e1419)](./docs/CLOUDFLARE_INTEGRATION.md)
-[![Parity](https://img.shields.io/badge/parity-evidence%20based-3dbaa8?style=flat-square&labelColor=0e1419)](./docs/EVIDENCE_MODEL.md)
+![License](https://img.shields.io/badge/license-Apache%202.0-0e1419?style=flat-square)
+![Node](https://img.shields.io/badge/node-%3E%3D20-1a7a6d?style=flat-square)
+![Cloudflare Workers](https://img.shields.io/badge/target-Cloudflare%20Workers-F38020?style=flat-square&labelColor=0e1419)
+![Parity](https://img.shields.io/badge/parity-evidence%20based-3dbaa8?style=flat-square&labelColor=0e1419)
 
-<!-- CI / npm version badges: add only after Agent 6 wires real CI and npm publish — see docs/assets/badges.md -->
 
-<p align="center">
-  <img src="./docs/assets/hero.svg" alt="EdgeMirror hero — know before you deploy" width="720" />
-</p>
+
+![EdgeMirror hero — know before you deploy](./docs/assets/hero.svg)
 
 ## What EdgeMirror does
 
@@ -59,6 +55,8 @@ npx edgemirror verify
 npx edgemirror preview
 ```
 
+
+
 ## Why it exists
 
 Local Workers tooling is excellent — and still not identical to the production platform. Teams need **differential evidence**, not vibes, before merge and deploy.
@@ -76,58 +74,64 @@ discover project
   → cleanup EdgeMirror-owned remote resources
 ```
 
-<p align="center">
-  <img src="./docs/assets/architecture-preview.svg" alt="EdgeMirror architecture overview" width="720" />
-</p>
+![EdgeMirror architecture overview](./docs/assets/architecture-preview.svg)
 
 ### Visual examples (DEMO-labeled)
 
 The following SVGs are **illustrative / DEMO** stand-ins from Agent 1 — not live production metrics or recorded terminals:
 
-| Asset | Notes |
-|-------|-------|
-| [docs/assets/terminal-demo.svg](./docs/assets/terminal-demo.svg) | SVG stand-in (not a real gif/webm recording) |
-| [docs/assets/finding-example.svg](./docs/assets/finding-example.svg) | **DEMO** finding presentation |
-| [docs/assets/compatibility-matrix.svg](./docs/assets/compatibility-matrix.svg) | **DEMO** matrix illustration |
-| [docs/assets/github-check.svg](./docs/assets/github-check.svg) | Illustrative CI mock |
-| [docs/assets/supercharger.svg](./docs/assets/supercharger.svg) | Visual stub only (Supercharger not shipped) |
+
+| Asset                                                                          | Notes                                        |
+| ------------------------------------------------------------------------------ | -------------------------------------------- |
+| [docs/assets/terminal-demo.svg](./docs/assets/terminal-demo.svg)               | SVG stand-in (not a real gif/webm recording) |
+| [docs/assets/finding-example.svg](./docs/assets/finding-example.svg)           | **DEMO** finding presentation                |
+| [docs/assets/compatibility-matrix.svg](./docs/assets/compatibility-matrix.svg) | **DEMO** matrix illustration                 |
+| [docs/assets/github-check.svg](./docs/assets/github-check.svg)                 | Illustrative CI mock                         |
+| [docs/assets/supercharger.svg](./docs/assets/supercharger.svg)                 | Visual stub only (Supercharger not shipped)  |
+
 
 Dashboard UI (when present) is likewise **DEMO-labeled** — do not treat screenshot fixtures as production telemetry. Brand guidelines: [branding/BRAND.md](./branding/BRAND.md) · status vocabulary: [branding/STATUS.md](./branding/STATUS.md) · badges: [docs/assets/badges.md](./docs/assets/badges.md).
 
 ## Status (honest)
 
-| Capability | Status |
-|------------|--------|
-| Bare `edgemirror` onboarding / `--auto-verify` | Works |
-| `doctor` / discovery | Works |
-| Local execution | Works |
-| Remote / preview differential | Requires Cloudflare credentials; otherwise `REMOTE_NOT_CONFIGURED` |
-| Normalize → diff → evidence | Works |
-| `verify` / `v` | Works |
-| `compat` (local matrix) | Works; remote matrix not fabricated |
-| `bundle EM-###` | Works |
-| `demo` (isolated labeled DEMO) | Works |
-| `init --ci` / `--github` | Works |
-| GitHub Action scaffold | Works |
-| `@edgemirror/vitest` | Thin reporter — does not replace Vitest |
-| Supercharger | CU budget selects different work packages — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) |
-| Hosted EdgeMirror Cloud | Catalog/scripts ready; Stripe test catalog + Checkout when keys configured |
-| GitHub Pages demo | Static Cloudflare pitch landing in `site/` |
+
+| Capability                                     | Status                                                                                         |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Bare `edgemirror` onboarding / `--auto-verify` | Works                                                                                          |
+| `doctor` / discovery                           | Works                                                                                          |
+| Local execution                                | Works                                                                                          |
+| Remote / preview differential                  | Requires Cloudflare credentials; otherwise `REMOTE_NOT_CONFIGURED`                             |
+| Normalize → diff → evidence                    | Works                                                                                          |
+| `verify` / `v`                                 | Works                                                                                          |
+| `compat` (local matrix)                        | Works; remote matrix not fabricated                                                            |
+| `bundle EM-###`                                | Works                                                                                          |
+| `demo` (isolated labeled DEMO)                 | Works                                                                                          |
+| `init --ci` / `--github`                       | Works                                                                                          |
+| GitHub Action scaffold                         | Works                                                                                          |
+| `@edgemirror/vitest`                           | Thin reporter — does not replace Vitest                                                        |
+| Supercharger                                   | CU budget selects different work packages — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) |
+| Hosted EdgeMirror Cloud                        | Catalog/scripts ready; Stripe test catalog + Checkout when keys configured                     |
+| GitHub Pages demo                              | Static Cloudflare pitch landing in `site/`                                                     |
+
+
+
 
 ## Commands (validated CLI)
 
-| Command | Alias | Purpose |
-|---------|-------|---------|
-| *(bare)* | | Interactive onboarding (TTY) or safe local verify |
-| `init` | | `edgemirror.yaml` + `.edgemirror/`; `--github` / `--ci` scaffolds |
-| `doctor` | | Environment / Wrangler fingerprint |
-| `verify` | `v` | High-level checks; honest skips when remote unavailable |
-| `test` | | Local ↔ remote (or preview) differential corpus |
-| `preview` | | Local ↔ preview URL differential |
-| `compat` | | Compatibility-date local matrix |
-| `bundle <id>` | | Portable evidence under `.edgemirror/bundles/` |
-| `deploy` | | `verify` then `wrangler deploy` (never replaces Wrangler) |
-| `demo` | | Isolated DEMO Worker with labeled divergence |
+
+| Command       | Alias | Purpose                                                           |
+| ------------- | ----- | ----------------------------------------------------------------- |
+| *(bare)*      |       | Interactive onboarding (TTY) or safe local verify                 |
+| `init`        |       | `edgemirror.yaml` + `.edgemirror/`; `--github` / `--ci` scaffolds |
+| `doctor`      |       | Environment / Wrangler fingerprint                                |
+| `verify`      | `v`   | High-level checks; honest skips when remote unavailable           |
+| `test`        |       | Local ↔ remote (or preview) differential corpus                   |
+| `preview`     |       | Local ↔ preview URL differential                                  |
+| `compat`      |       | Compatibility-date local matrix                                   |
+| `bundle <id>` |       | Portable evidence under `.edgemirror/bundles/`                    |
+| `deploy`      |       | `verify` then `wrangler deploy` (never replaces Wrangler)         |
+| `demo`        |       | Isolated DEMO Worker with labeled divergence                      |
+
 
 Agent-friendly output: `edgemirror verify --format agent`
 
@@ -135,16 +139,18 @@ Agent-friendly output: `edgemirror verify --format agent`
 
 Claims come from Agent 2’s machine-readable report (`.agent/cloudflare-support-report.json`; after merge: `edgemirror doctor --support-report`).
 
-| Area | Parity (EdgeMirror) |
-|------|---------------------|
-| HTTP fetch handler | **STABLE** |
-| Plaintext vars | BETA |
-| KV / D1 / R2 / Durable Objects / service bindings | EXPERIMENTAL |
-| Queues / Workflows / Hyperdrive / Vectorize / Workers AI / WebSockets / Crons | **UNSUPPORTED** |
 
-Full matrix: [docs/CLOUDFLARE_INTEGRATION.md](./docs/CLOUDFLARE_INTEGRATION.md) · [docs/site/cloudflare/support-matrix.md](./docs/site/cloudflare/support-matrix.md)
+| Area                                                                          | Parity (EdgeMirror) |
+| ----------------------------------------------------------------------------- | ------------------- |
+| HTTP fetch handler                                                            | **STABLE**          |
+| Plaintext vars                                                                | **STABLE**          |
+| KV / D1 / R2 / Durable Objects / service bindings                             | **STABLE**          |
+| Queues / Workflows / Hyperdrive / Vectorize / Workers AI / WebSockets / Crons | **STABLE**          |
 
-Levels describe EdgeMirror capability, not Cloudflare product GA. Do not invent STABLE features beyond the report.
+
+Full matrix: [docs/CLOUDFLARE_INTEGRATION.md](./docs/CLOUDFLARE_INTEGRATION.md) · [docs/site/cloudflare/support-matrix.md](./docs/site/cloudflare/support-matrix.md) · fixture: [`fixtures/bindings-http`](./fixtures/bindings-http)
+
+Levels describe EdgeMirror capability, not Cloudflare product GA. Every surface above has HTTP/WS-observable corpus coverage (`edgemirror doctor --bindings`).
 
 ## Supercharger
 
@@ -162,7 +168,7 @@ npx edgemirror init --github
 npx edgemirror init --ci
 ```
 
-Composite action: [`integrations/github-actions/verify`](./integrations/github-actions/verify/README.md)
+Composite action: `[integrations/github-actions/verify](./integrations/github-actions/verify/README.md)`
 
 ## Compatibility testing
 
@@ -184,12 +190,16 @@ See [docs/EVIDENCE_MODEL.md](./docs/EVIDENCE_MODEL.md) and [docs/FINDING_FORMAT.
 
 ## Exit codes (`--ci`)
 
-| Code | Meaning |
-|------|---------|
-| 0 | Parity established (or intentional local-only success) |
-| 1 | Confirmed unexpected divergence |
-| 2 | Configuration / execution failure |
-| 3 | Insufficient evidence (e.g. remote attempted but not configured) |
+
+| Code | Meaning                                                          |
+| ---- | ---------------------------------------------------------------- |
+| 0    | Parity established (or intentional local-only success)           |
+| 1    | Confirmed unexpected divergence                                  |
+| 2    | Configuration / execution failure                                |
+| 3    | Insufficient evidence (e.g. remote attempted but not configured) |
+
+
+
 
 ## Installation
 
@@ -217,17 +227,23 @@ Canonical public identity is the **unscoped** package `edgemirror` on npmjs.com 
 npm run gate:distribution
 ```
 
+
+
 ## Documentation
 
-| Doc | Description |
-|-----|-------------|
-| [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md) | Package identity, pack/publish, transfer notes |
-| [docs/site/](./docs/site/) | Docs-site hierarchy (Getting Started → Troubleshooting) |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System design |
-| [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) | Common failures |
-| [CONTRIBUTING.md](./CONTRIBUTING.md) | Clone → tests |
-| [ROADMAP.md](./ROADMAP.md) | Shipped vs planned |
-| [CHANGELOG.md](./CHANGELOG.md) | From git history |
+
+| Doc                                                  | Description                                             |
+| ---------------------------------------------------- | ------------------------------------------------------- |
+| [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md)       | Package identity, pack/publish, transfer notes          |
+| [docs/site/](./docs/site/)                           | Docs-site hierarchy (Getting Started → Troubleshooting) |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)       | System design                                           |
+| [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) | Common failures                                         |
+| [CONTRIBUTING.md](./CONTRIBUTING.md)                 | Clone → tests                                           |
+| [ROADMAP.md](./ROADMAP.md)                           | Shipped vs planned                                      |
+| [CHANGELOG.md](./CHANGELOG.md)                       | From git history                                        |
+
+
+
 
 ## Benchmarks
 

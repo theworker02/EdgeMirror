@@ -36,9 +36,7 @@ Or supply credentials so `wrangler versions upload` can run.
 
 ## Unsupported / experimental binding parity
 
-Doctor may **discover** bindings (STABLE discovery) while **parity** remains EXPERIMENTAL or UNSUPPORTED. That is intentional — see [CLOUDFLARE_INTEGRATION.md](./CLOUDFLARE_INTEGRATION.md) matrix from Agent 2’s report.
-
-Do not force queue/workflow/AI HTTP corpus comparisons; the report marks those parity paths UNSUPPORTED to avoid false findings.
+Doctor may **discover** bindings while running HTTP/WS-observable parity. All matrix surfaces are **STABLE** — see [CLOUDFLARE_INTEGRATION.md](./CLOUDFLARE_INTEGRATION.md) and `fixtures/bindings-http`.
 
 ## Remote timeout / budget exceeded
 

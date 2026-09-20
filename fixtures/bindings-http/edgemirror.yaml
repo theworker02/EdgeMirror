@@ -1,0 +1,13 @@
+# EdgeMirror config — bindings HTTP-observable corpus
+project:
+  wranglerConfig: wrangler.jsonc
+
+corpus:
+  includeBuiltin: true
+  paths:
+    - corpus
+
+remote:
+  maxRuns: 50
+  maxDurationMinutes: 10
+  cleanup: true

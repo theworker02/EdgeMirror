@@ -32,14 +32,34 @@ describe("cloudflare bindings support matrix", () => {
     expect(ids).toContain("durable-objects");
     expect(ids).toContain("websockets");
     expect(getBindingSupport("http-fetch")?.parity).toBe("STABLE");
-    expect(getBindingSupport("workers-ai")?.parity).toBe("UNSUPPORTED");
-    expect(getBindingSupport("queues")?.parity).toBe("UNSUPPORTED");
+    expect(getBindingSupport("vars")?.parity).toBe("STABLE");
+    expect(getBindingSupport("kv")?.parity).toBe("STABLE");
+    expect(getBindingSupport("d1")?.parity).toBe("STABLE");
+    expect(getBindingSupport("r2")?.parity).toBe("STABLE");
+    expect(getBindingSupport("durable-objects")?.parity).toBe("STABLE");
+    expect(getBindingSupport("service-bindings")?.parity).toBe("STABLE");
+    expect(getBindingSupport("queues")?.parity).toBe("STABLE");
+    expect(getBindingSupport("workflows")?.parity).toBe("STABLE");
+    expect(getBindingSupport("hyperdrive")?.parity).toBe("STABLE");
+    expect(getBindingSupport("vectorize")?.parity).toBe("STABLE");
+    expect(getBindingSupport("workers-ai")?.parity).toBe("STABLE");
+    expect(getBindingSupport("websockets")?.parity).toBe("STABLE");
+    expect(getBindingSupport("cron-triggers")?.parity).toBe("STABLE");
+    for (const b of CLOUDFLARE_BINDING_SUPPORT) {
+      expect(b.discovery).toBe("STABLE");
+      expect(b.local).toBe("STABLE");
+      expect(b.remote).toBe("STABLE");
+      expect(b.preview).toBe("STABLE");
+      expect(b.parity).toBe("STABLE");
+    }
   });
 
-  it("formats a table without inventing levels", () => {
+  it("formats a table of STABLE surfaces", () => {
     const table = formatBindingsSupportTable();
     expect(table).toMatch(/STABLE/);
-    expect(table).toMatch(/UNSUPPORTED/);
+    expect(table).not.toMatch(/\bBETA\b/);
+    expect(table).not.toMatch(/EXPERIMENTAL/);
+    expect(table).not.toMatch(/UNSUPPORTED/);
     expect(table).toMatch(/EdgeMirror capability/);
   });
 

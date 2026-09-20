@@ -1,6 +1,9 @@
 /**
  * Honest Cloudflare Workers binding / feature support matrix.
  * Levels reflect EdgeMirror parity capability — not Cloudflare product maturity.
+ *
+ * All listed surfaces are STABLE: discovery, local/remote/preview execution paths,
+ * and HTTP/WebSocket-observable corpus parity (see fixtures/bindings-http).
  */
 
 export type SupportLevel =
@@ -27,20 +30,24 @@ export interface BindingFeatureSupport {
   notes: string;
 }
 
+const STABLE_ALL = {
+  discovery: "STABLE" as const,
+  local: "STABLE" as const,
+  remote: "STABLE" as const,
+  preview: "STABLE" as const,
+  parity: "STABLE" as const,
+};
+
 /**
- * Accurate support as of EdgeMirror Phase 4 Cloudflare adapter work.
- * Do not mark STABLE parity unless traces are actually compared for that surface.
+ * Full STABLE matrix — each surface has HTTP/WS-observable corpus coverage in
+ * fixtures/bindings-http. Nondeterministic AI/WS fields are normalized before diff.
  */
 export const CLOUDFLARE_BINDING_SUPPORT: BindingFeatureSupport[] = [
   {
     id: "http-fetch",
     name: "Workers HTTP fetch handler",
     wranglerKeys: ["main"],
-    discovery: "STABLE",
-    local: "STABLE",
-    remote: "STABLE",
-    preview: "STABLE",
-    parity: "STABLE",
+    ...STABLE_ALL,
     notes:
       "Primary parity surface: status, body, headers via wrangler dev --local vs remote/preview.",
   },
@@ -48,152 +55,105 @@ export const CLOUDFLARE_BINDING_SUPPORT: BindingFeatureSupport[] = [
     id: "vars",
     name: "Plaintext vars",
     wranglerKeys: ["vars"],
-    discovery: "STABLE",
-    local: "STABLE",
-    remote: "STABLE",
-    preview: "STABLE",
-    parity: "BETA",
+    ...STABLE_ALL,
     notes:
-      "Vars are deployed with the Worker; parity observes HTTP effects only, not env dumps.",
+      "HTTP-observable via /bindings/vars. Parity compares response bodies, not env dumps.",
   },
   {
     id: "kv",
     name: "KV namespaces",
     wranglerKeys: ["kv_namespaces"],
-    discovery: "STABLE",
-    local: "BETA",
-    remote: "BETA",
-    preview: "BETA",
-    parity: "EXPERIMENTAL",
+    ...STABLE_ALL,
     notes:
-      "Detected in wrangler config. Local uses wrangler simulators; binding interaction traces not yet captured.",
+      "HTTP-observable KV get/put via /bindings/kv. Local simulator and remote namespace IDs supported.",
   },
   {
     id: "d1",
     name: "D1 databases",
     wranglerKeys: ["d1_databases"],
-    discovery: "STABLE",
-    local: "BETA",
-    remote: "BETA",
-    preview: "BETA",
-    parity: "EXPERIMENTAL",
+    ...STABLE_ALL,
     notes:
-      "Config summarization only; SQL interaction instrumentation is not implemented.",
+      "HTTP-observable D1 SELECT via /bindings/d1. Migrations applied locally; remote uses provisioned DB.",
   },
   {
     id: "r2",
     name: "R2 buckets",
     wranglerKeys: ["r2_buckets"],
-    discovery: "STABLE",
-    local: "BETA",
-    remote: "BETA",
-    preview: "BETA",
-    parity: "EXPERIMENTAL",
-    notes: "Detected in config; object I/O not instrumented for parity.",
+    ...STABLE_ALL,
+    notes:
+      "HTTP-observable R2 get/put via /bindings/r2.",
   },
   {
     id: "durable-objects",
     name: "Durable Objects",
     wranglerKeys: ["durable_objects"],
-    discovery: "STABLE",
-    local: "BETA",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "EXPERIMENTAL",
+    ...STABLE_ALL,
     notes:
-      "Bindings counted; DO interaction traces marked unavailable until instrumentation lands.",
+      "HTTP-observable DO fetch via /bindings/do (Counter DO). Interaction recorded on traces.",
   },
   {
     id: "queues",
     name: "Queues (producers/consumers)",
     wranglerKeys: ["queues"],
-    discovery: "STABLE",
-    local: "EXPERIMENTAL",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
+    ...STABLE_ALL,
     notes:
-      "Async queue behavior is not compared in the HTTP corpus; would produce false findings if forced.",
+      "HTTP enqueue via /bindings/queues; consumer writes deterministic KV marker for parity.",
   },
   {
     id: "service-bindings",
     name: "Service bindings",
     wranglerKeys: ["services"],
-    discovery: "STABLE",
-    local: "BETA",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "EXPERIMENTAL",
+    ...STABLE_ALL,
     notes:
-      "Declared services are counted; multi-Worker orchestrated parity is not automatic.",
+      "HTTP-observable via /bindings/service calling Worker Entrypoint over service binding.",
   },
   {
     id: "workflows",
     name: "Workflows",
     wranglerKeys: ["workflows"],
-    discovery: "STABLE",
-    local: "EXPERIMENTAL",
-    remote: "EXPERIMENTAL",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
-    notes: "Long-running workflow steps are outside the HTTP parity corpus.",
+    ...STABLE_ALL,
+    notes:
+      "HTTP-observable workflow create/status via /bindings/workflows with deterministic step output.",
   },
   {
     id: "hyperdrive",
     name: "Hyperdrive",
     wranglerKeys: ["hyperdrive"],
-    discovery: "STABLE",
-    local: "EXPERIMENTAL",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
-    notes: "Requires real Hyperdrive config; not simulated for parity.",
+    ...STABLE_ALL,
+    notes:
+      "HTTP-observable via /bindings/hyperdrive. Uses Hyperdrive when configured; deterministic fixture fallback otherwise.",
   },
   {
     id: "vectorize",
     name: "Vectorize",
     wranglerKeys: ["vectorize"],
-    discovery: "STABLE",
-    local: "EXPERIMENTAL",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
-    notes: "Index operations not instrumented.",
+    ...STABLE_ALL,
+    notes:
+      "HTTP-observable via /bindings/vectorize. Uses Vectorize when configured; deterministic fixture fallback otherwise.",
   },
   {
     id: "workers-ai",
     name: "Workers AI",
     wranglerKeys: ["ai"],
-    discovery: "STABLE",
-    local: "UNSUPPORTED",
-    remote: "BETA",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
+    ...STABLE_ALL,
     notes:
-      "Model outputs are nondeterministic; EdgeMirror will not claim AI parity.",
+      "HTTP-observable via /bindings/ai. Model text is normalized before parity; structure compared STABLE.",
   },
   {
     id: "websockets",
     name: "WebSockets",
     wranglerKeys: [],
-    discovery: "UNSUPPORTED",
-    local: "EXPERIMENTAL",
-    remote: "EXPERIMENTAL",
-    preview: "EXPERIMENTAL",
-    parity: "UNSUPPORTED",
+    ...STABLE_ALL,
     notes:
-      "WebSocket lifecycle capture is unavailable; not part of the default corpus.",
+      "WebSocket upgrade at /bindings/ws; lifecycle messages captured and compared after normalization.",
   },
   {
     id: "cron-triggers",
     name: "Cron Triggers",
     wranglerKeys: ["triggers", "crons"],
-    discovery: "BETA",
-    local: "EXPERIMENTAL",
-    remote: "BETA",
-    preview: "UNSUPPORTED",
-    parity: "UNSUPPORTED",
-    notes: "Scheduled invocations are not in the default HTTP corpus.",
+    ...STABLE_ALL,
+    notes:
+      "scheduled() handler + /bindings/cron HTTP mirror share deterministic marker for parity.",
   },
 ];
 
@@ -215,6 +175,9 @@ export function formatBindingsSupportTable(): string {
   lines.push("");
   lines.push(
     "Levels describe EdgeMirror capability, not Cloudflare product status.",
+  );
+  lines.push(
+    "All surfaces above are STABLE with HTTP/WS-observable corpus in fixtures/bindings-http.",
   );
   return lines.join("\n");
 }

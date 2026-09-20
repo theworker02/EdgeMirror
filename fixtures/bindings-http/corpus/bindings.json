@@ -1,0 +1,114 @@
+[
+  {
+    "id": "bindings-vars-get",
+    "name": "GET /bindings/vars",
+    "feature": "vars",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/vars" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-kv-get",
+    "name": "GET /bindings/kv",
+    "feature": "kv",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/kv" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-d1-get",
+    "name": "GET /bindings/d1",
+    "feature": "d1",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/d1" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-r2-get",
+    "name": "GET /bindings/r2",
+    "feature": "r2",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/r2" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-do-get",
+    "name": "GET /bindings/do",
+    "feature": "durable-objects",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/do" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-queues",
+    "name": "GET /bindings/queues",
+    "feature": "queues",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/queues" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-service",
+    "name": "GET /bindings/service",
+    "feature": "service-bindings",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/service" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-workflows",
+    "name": "GET /bindings/workflows",
+    "feature": "workflows",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/workflows" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-hyperdrive",
+    "name": "GET /bindings/hyperdrive",
+    "feature": "hyperdrive",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/hyperdrive" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-vectorize",
+    "name": "GET /bindings/vectorize",
+    "feature": "vectorize",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/vectorize" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-ai",
+    "name": "GET /bindings/ai",
+    "feature": "workers-ai",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/ai" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-ws",
+    "name": "GET /bindings/ws (WebSocket probe)",
+    "feature": "websockets",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/ws" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-cron",
+    "name": "GET /bindings/cron",
+    "feature": "cron-triggers",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/cron" },
+    "expectedBehavior": "parity"
+  },
+  {
+    "id": "bindings-summary",
+    "name": "GET /bindings/summary",
+    "feature": "bindings",
+    "category": "bindings",
+    "request": { "method": "GET", "path": "/bindings/summary" },
+    "expectedBehavior": "parity"
+  }
+]
