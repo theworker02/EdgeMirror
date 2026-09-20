@@ -9,6 +9,7 @@ import type {
 } from "../trace/schema.js";
 import { EDGEMIRROR_VERSION } from "../version.js";
 import { findUp } from "../config/index.js";
+import { detectCloudflareAuth } from "../adapters/cloudflare/auth.js";
 
 export interface DiscoveredProject {
   projectRoot: string;
@@ -209,19 +210,12 @@ function detectPackageManager(projectRoot: string): string | undefined {
   return undefined;
 }
 
-function detectCloudflareAuth(): EnvironmentFingerprint["cloudflareAuth"] {
-  if (process.env.CLOUDFLARE_API_TOKEN || process.env.CLOUDFLARE_API_KEY) {
+function detectCloudflareAuthLegacy(): EnvironmentFingerprint["cloudflareAuth"] {
+  const detailed = detectCloudflareAuth();
+  if (detailed.mode === "api_token" || detailed.mode === "api_key_email") {
     return "configured";
   }
-  // Wrangler stores OAuth credentials in the user config directory.
-  const home = process.env.USERPROFILE ?? process.env.HOME;
-  if (home) {
-    const candidates = [
-      join(home, ".wrangler", "config", "default.toml"),
-      join(home, ".config", ".wrangler", "config", "default.toml"),
-    ];
-    if (candidates.some((p) => existsSync(p))) return "unknown";
-  }
+  if (detailed.mode === "wrangler_oauth") return "unknown";
   return "missing";
 }
 
@@ -268,7 +262,7 @@ export function discoverProject(cwd = process.cwd()): DiscoveredProject {
     bindings,
     wranglerConfigPath: relative(projectRoot, wranglerConfigPath) || wranglerConfigPath,
     projectRoot,
-    cloudflareAuth: detectCloudflareAuth(),
+    cloudflareAuth: detectCloudflareAuthLegacy(),
     detectedAt: new Date().toISOString(),
     edgemirrorVersion: EDGEMIRROR_VERSION,
   };

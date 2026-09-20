@@ -3,7 +3,6 @@
  * When credentials are missing, returns REMOTE_NOT_CONFIGURED honestly.
  */
 
-import { spawn } from "node:child_process";
 import type { ExecutionContext, ExecutionTarget } from "./types.js";
 import type { ParityTest } from "../trace/schema.js";
 import {
@@ -13,41 +12,15 @@ import {
   headersFromFetch,
   unavailable,
 } from "../trace/factory.js";
-
-function hasCloudflareCredentials(): boolean {
-  return Boolean(
-    process.env.CLOUDFLARE_API_TOKEN ||
-      process.env.CLOUDFLARE_API_KEY ||
-      process.env.CLOUDFLARE_EMAIL,
-  );
-}
-
-function runWrangler(
-  args: string[],
-  cwd: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
-    const child = spawn(cmd, ["wrangler", ...args], {
-      cwd,
-      env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "true" },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (c: Buffer) => {
-      stdout += c.toString("utf8");
-    });
-    child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf8");
-    });
-    child.on("close", (code) => {
-      resolve({ code: code ?? 1, stdout, stderr });
-    });
-  });
-}
+import {
+  hasCloudflareCredentials,
+  remoteNotConfiguredMessage,
+} from "../adapters/cloudflare/auth.js";
+import { runWrangler } from "../adapters/cloudflare/wrangler.js";
+import {
+  classifyInfraFailure,
+  formatInfraFailureReport,
+} from "../adapters/cloudflare/failures.js";
 
 function parsePreviewUrl(output: string): string | undefined {
   const match =
@@ -70,8 +43,7 @@ export interface PreviewPrepareResult {
 export class PreviewExecutionTarget implements ExecutionTarget {
   readonly kind = "remote" as const;
   private configured = false;
-  private notConfiguredReason =
-    "REMOTE_NOT_CONFIGURED: Cloudflare credentials required for preview execution.";
+  private notConfiguredReason = remoteNotConfiguredMessage("preview execution");
   private baseUrl?: string;
 
   constructor(
@@ -103,9 +75,7 @@ export class PreviewExecutionTarget implements ExecutionTarget {
         );
       if (!authenticated) {
         this.configured = false;
-        this.notConfiguredReason =
-          "REMOTE_NOT_CONFIGURED: Cloudflare authentication is unavailable for preview. " +
-          "Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, or run `npx wrangler login`.";
+        this.notConfiguredReason = remoteNotConfiguredMessage("preview execution");
         return;
       }
     }
@@ -122,12 +92,12 @@ export class PreviewExecutionTarget implements ExecutionTarget {
     );
 
     if (upload.code !== 0) {
-      // Fallback: try `wrangler deploy --dry-run` is not enough; report failure honestly.
+      const classified = classifyInfraFailure(
+        "PREVIEW_NOT_AVAILABLE\n" + upload.stdout + upload.stderr,
+      );
       this.configured = false;
       this.notConfiguredReason = [
-        "PREVIEW_NOT_AVAILABLE",
-        "",
-        "Could not create a Cloudflare preview/version URL.",
+        formatInfraFailureReport(classified),
         "",
         (upload.stdout + upload.stderr).trim().slice(0, 1500) ||
           "Wrangler versions upload failed.",

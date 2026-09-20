@@ -1,5 +1,6 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { createServer } from "node:net";
+import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import type { ExecutionContext, ExecutionTarget } from "./types.js";
 import type { ParityTest } from "../trace/schema.js";
@@ -10,6 +11,10 @@ import {
   headersFromFetch,
   unavailable,
 } from "../trace/factory.js";
+import {
+  resolveWranglerBin,
+  writeCompatDateOverlay,
+} from "../adapters/cloudflare/wrangler.js";
 
 async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -28,11 +33,6 @@ async function getFreePort(): Promise<number> {
   });
 }
 
-function resolveWranglerBin(): { cmd: string; argsPrefix: string[] } {
-  // Prefer local workspace wrangler via npx.
-  return { cmd: process.platform === "win32" ? "npx.cmd" : "npx", argsPrefix: ["wrangler"] };
-}
-
 export class LocalExecutionTarget implements ExecutionTarget {
   readonly kind = "local" as const;
   private port?: number;
@@ -41,6 +41,7 @@ export class LocalExecutionTarget implements ExecutionTarget {
   private ready = false;
   private stderr = "";
   private stdout = "";
+  private effectiveConfigPath?: string;
 
   constructor(private readonly ctx: ExecutionContext) {}
 
@@ -48,6 +49,16 @@ export class LocalExecutionTarget implements ExecutionTarget {
     this.port = await getFreePort();
     this.baseUrl = `http://127.0.0.1:${this.port}`;
     const { cmd, argsPrefix } = resolveWranglerBin();
+
+    this.effectiveConfigPath = this.ctx.wranglerConfigPath;
+    if (this.ctx.compatibilityDateOverride) {
+      this.effectiveConfigPath = writeCompatDateOverlay({
+        sourceConfigPath: this.ctx.wranglerConfigPath,
+        overlayDir: join(this.ctx.ownershipDir, "compat-overlay"),
+        compatibilityDate: this.ctx.compatibilityDateOverride,
+      });
+    }
+
     const args = [
       ...argsPrefix,
       "dev",
@@ -57,12 +68,8 @@ export class LocalExecutionTarget implements ExecutionTarget {
       "--port",
       String(this.port),
       "--config",
-      this.ctx.wranglerConfigPath,
+      this.effectiveConfigPath,
     ];
-    if (this.ctx.compatibilityDateOverride) {
-      // Wrangler does not always accept CLI override; documented for future.
-      // Compatibility date override is applied via temporary config in orchestrator when needed.
-    }
 
     this.child = spawn(cmd, args, {
       cwd: this.ctx.projectRoot,

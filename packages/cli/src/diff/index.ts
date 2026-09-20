@@ -95,6 +95,7 @@ export function classifyComparison(input: {
   if (input.remote.status === "REMOTE_NOT_CONFIGURED") {
     return "REMOTE_NOT_CONFIGURED";
   }
+  // Infrastructure / transport failures must never become RUNTIME_DIVERGENCE.
   if (
     input.local.status === "error" ||
     input.remote.status === "error" ||

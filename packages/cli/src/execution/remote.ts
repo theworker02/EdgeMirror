@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
@@ -16,47 +15,21 @@ import {
   claimResource,
   type OwnedResource,
 } from "../cleanup/ownership.js";
+import {
+  hasCloudflareCredentials,
+  remoteNotConfiguredMessage,
+} from "../adapters/cloudflare/auth.js";
+import { runWrangler } from "../adapters/cloudflare/wrangler.js";
+import {
+  classifyInfraFailure,
+  formatInfraFailureReport,
+} from "../adapters/cloudflare/failures.js";
 
 export interface RemotePrepareResult {
   configured: boolean;
   reason?: string;
   workerName?: string;
   workersDevUrl?: string;
-}
-
-function hasCloudflareCredentials(): boolean {
-  return Boolean(
-    process.env.CLOUDFLARE_API_TOKEN ||
-      process.env.CLOUDFLARE_API_KEY ||
-      process.env.CLOUDFLARE_EMAIL,
-  );
-}
-
-function runWrangler(
-  args: string[],
-  cwd: string,
-): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const cmd = process.platform === "win32" ? "npx.cmd" : "npx";
-    const child = spawn(cmd, ["wrangler", ...args], {
-      cwd,
-      env: { ...process.env, WRANGLER_SEND_METRICS: "false", CI: "true" },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (c: Buffer) => {
-      stdout += c.toString("utf8");
-    });
-    child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf8");
-    });
-    child.on("close", (code) => {
-      resolve({ code: code ?? 1, stdout, stderr });
-    });
-  });
 }
 
 function parseDeployUrl(output: string): string | undefined {
@@ -73,8 +46,7 @@ function parseDeployUrl(output: string): string | undefined {
 export class RemoteCloudflareExecutionTarget implements ExecutionTarget {
   readonly kind = "remote" as const;
   private configured = false;
-  private notConfiguredReason =
-    "Cloudflare credentials were not found. Set CLOUDFLARE_API_TOKEN (recommended) or run `wrangler login`, then retry.";
+  private notConfiguredReason = remoteNotConfiguredMessage("remote execution");
   private workerName?: string;
   private baseUrl?: string;
   private owned: OwnedResource[] = [];
@@ -101,9 +73,7 @@ export class RemoteCloudflareExecutionTarget implements ExecutionTarget {
         );
       if (!authenticated) {
         this.configured = false;
-        this.notConfiguredReason =
-          "REMOTE_NOT_CONFIGURED: Cloudflare authentication is unavailable. " +
-          "Set CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID, or run `npx wrangler login`.";
+        this.notConfiguredReason = remoteNotConfiguredMessage("remote execution");
         return;
       }
     }
@@ -297,35 +267,12 @@ function inferMainFromToml(toml: string): string | undefined {
 }
 
 function formatRemoteFailure(output: string): string {
-  if (/Authentication error|Invalid API Token|not authenticated/i.test(output)) {
-    return [
-      "REMOTE EXECUTION FAILED",
-      "",
-      "Cloudflare authentication failed.",
-      "",
-      "Set CLOUDFLARE_API_TOKEN with Workers Scripts:Edit permission,",
-      "or run `npx wrangler login`.",
-      "",
-      "No remote resources were created.",
-    ].join("\n");
-  }
-  if (/permission|forbidden|403/i.test(output)) {
-    return [
-      "REMOTE EXECUTION FAILED",
-      "",
-      "EdgeMirror could not create its temporary Worker.",
-      "",
-      "Required capability:",
-      "  Workers Scripts: Edit",
-      "",
-      "No remote resources were created.",
-    ].join("\n");
-  }
+  const classified = classifyInfraFailure(output);
   return [
-    "REMOTE EXECUTION FAILED",
+    formatInfraFailureReport(classified),
     "",
-    "Wrangler deploy failed while creating an isolated EdgeMirror Worker.",
+    "No remote resources were retained for this failed prepare.",
     "",
-    output.trim().slice(0, 2000),
+    output.trim().slice(0, 1500),
   ].join("\n");
 }
