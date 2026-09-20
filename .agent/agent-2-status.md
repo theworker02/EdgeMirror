@@ -1,52 +1,27 @@
 ﻿# Agent 2 Status — Cloudflare / Live Demo
 
-Updated: 2026-09-19T21:20:00-04:00
+Updated: 2026-09-19T21:25:00-04:00
 
 ## CURRENT TASK
-Finalizing commits + agent-2-final.md handoff.
+COMPLETE — see `.agent/agent-2-final.md`
 
 ## FILES OWNED
-- packages/cli/src/adapters/cloudflare/**
-- packages/cli/src/execution/{local,remote,preview}.ts
-- packages/cli/src/compat/**
-- packages/cli/src/demo/**
-- packages/cli/src/cleanup/{ownership,reset}.ts
-- packages/cli/src/discovery/index.ts (auth wiring)
-- packages/cli/src/cli/commands/{demo,compat,doctor}.ts
-- packages/cli/src/cli/bin.ts
-- packages/cli/src/diff/index.ts (infra≠parity comment)
-- packages/cli/src/index.ts
-- tests/cloudflare-live/**
-- .agent/agent-2-*.md
-- .agent/cloudflare-support-report.json
+Cloudflare adapters, execution, compat/matrix, demo/pitch-demo/reset, gated live tests, support report.
 
 ## FILES MODIFIED
-See git status / commits on `agent/cloudflare`.
+Commits on `agent/cloudflare`: b28d65f, 06d346f, 905ff0b, 5ad27ad.
 
 ## DEPENDENCIES
-- Agent 4: consume `.agent/cloudflare-support-report.json` + `edgemirror doctor --support-report`
-- Agent 6: wire `npm run test:cloudflare-live` as optional CI job (do not fail default CI)
-- No CLOUDFLARE_API_TOKEN in this environment
+Agent 4 → support report; Agent 6 → optional live CI; credentials for full remote path.
 
 ## BLOCKERS
-None for OSS path. Live remote/preview full path needs credentials (honest REMOTE_NOT_CONFIGURED without them).
+None for merge of OSS path.
 
 ## TESTS RUN
-- `npm run build -w @edgemirror/cli` — pass
-- `npm run test -w @edgemirror/cli` — 32 passed
-- `edgemirror doctor --bindings` — pass
-- `edgemirror demo --quiet` — exit 0
-- `edgemirror pitch-demo --quiet` — exit 0 (~real local + REMOTE_NOT_CONFIGURED)
-- `edgemirror pitch-demo --synthesize-demo-remote --quiet` — exit 0
-- Live suite not executed (no token); gated behind EDGEMIRROR_CLOUDFLARE_LIVE=1
+32 CLI tests passed; pitch-demo smoke exit 0; live suite gated (no token).
 
 ## RESULTS
-- Cloudflare adapter pack: auth, bindings STABLE/BETA/EXPERIMENTAL/UNSUPPORTED, failures, runtime wrappers, support report
-- Compat/matrix apply real compatibility_date overlays (no fabricated cells)
-- pitch-demo / demo cloudflare / demo reset ownership-safe cleanup
-- tests/cloudflare-live/ separated from default test
+Mission complete for Agent 2 scope without fabricating remote/preview results.
 
 ## HANDOFF NOTES
-- Support report: `.agent/cloudflare-support-report.json` and `edgemirror doctor --support-report`
-- Do not treat DEMO/PITCH synthesized remotes as production evidence
-- `demo reset` only deletes ownership-marked Workers
+`.agent/agent-2-final.md` + `.agent/cloudflare-support-report.json`
