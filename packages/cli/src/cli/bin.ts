@@ -11,6 +11,7 @@ import { registerCompatCommand } from "./commands/compat.js";
 import { registerBundleCommand } from "./commands/bundle.js";
 import { registerDeployCommand } from "./commands/deploy.js";
 import { registerDemoCommand } from "./commands/demo.js";
+import { registerCloudCommand } from "./commands/cloud.js";
 import { runDefaultAction } from "./onboarding.js";
 
 const program = new Command();
@@ -35,6 +36,7 @@ Examples:
   edgemirror verify
   edgemirror v --format agent
   edgemirror demo            # isolated DEMO divergence (never mixes with real corpus)
+  edgemirror cloud billing   # Cloud billing status (requires API; OSS CLI stays free)
   edgemirror test --local
   edgemirror preview
   edgemirror compat --dates 2024-11-11,2025-04-01
@@ -51,6 +53,7 @@ registerCompatCommand(program);
 registerBundleCommand(program);
 registerDeployCommand(program);
 registerDemoCommand(program);
+registerCloudCommand(program);
 
 async function main(): Promise<void> {
   const argv = process.argv.slice(2);
@@ -65,6 +68,7 @@ async function main(): Promise<void> {
     "bundle",
     "deploy",
     "demo",
+    "cloud",
     "help",
   ]);
   const first = argv.find((a) => !a.startsWith("-"));
