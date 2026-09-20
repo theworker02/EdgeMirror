@@ -1,0 +1,15 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "EdgeMirror Cloud API",
+    "version": "0.1.0",
+    "description": "Billing + entitlements stubs. See apps/api/src/openapi.ts for the live export."
+  },
+  "paths": {
+    "/v1/billing/checkout": { "post": { "summary": "Checkout Session" } },
+    "/v1/billing/portal": { "post": { "summary": "Customer Portal" } },
+    "/v1/billing/webhooks/stripe": { "post": { "summary": "Stripe webhooks" } },
+    "/v1/billing/status": { "get": { "summary": "Billing status" } },
+    "/v1/entitlements/check": { "post": { "summary": "Entitlement check" } }
+  }
+}
