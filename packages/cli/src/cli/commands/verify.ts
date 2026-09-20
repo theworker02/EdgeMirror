@@ -13,17 +13,25 @@ export function registerVerifyCommand(program: Command): void {
     ci?: boolean;
     filter?: string;
     quiet?: boolean;
-    supercharge?: boolean;
+    supercharge?: boolean | string;
     fast?: boolean;
     full?: boolean;
     nightly?: boolean;
     mode?: string;
+    cu?: string;
   }) => {
     let selection: "full" | "fast" | "incremental" | "nightly" | undefined;
     if (opts.nightly) selection = "nightly";
     else if (opts.full) selection = "full";
     else if (opts.fast) selection = "fast";
     else if (opts.supercharge) selection = "incremental";
+
+    const cuFromFlag =
+      typeof opts.supercharge === "string" && /^\d+$/.test(opts.supercharge)
+        ? Number(opts.supercharge)
+        : opts.cu
+          ? Number(opts.cu)
+          : undefined;
 
     const result = await runVerify({
       format: (opts.format ?? "terminal") as ReportFormat,
@@ -41,6 +49,7 @@ export function registerVerifyCommand(program: Command): void {
             selection: selection ?? "incremental",
             timeToConfidence: true,
             cache: true,
+            maxCu: Number.isFinite(cuFromFlag) ? cuFromFlag : undefined,
           }
         : selection
           ? {
@@ -66,9 +75,10 @@ export function registerVerifyCommand(program: Command): void {
     .option("--ci", "CI exit codes")
     .option("--filter <pattern>", "Filter parity corpus tests")
     .option(
-      "--supercharge",
-      "Optional Supercharger: adaptive local scheduling + CU budgets",
+      "--supercharge [cu]",
+      "Optional Supercharger; optional CU budget (e.g. --supercharge 50000)",
     )
+    .option("--cu <n>", "CU budget when Supercharger is enabled")
     .option("--fast", "Time-to-confidence subset (honest reduced selection)")
     .option("--full", "Full corpus selection")
     .option("--nightly", "Nightly selection (currently full; labeled honestly)")

@@ -20,6 +20,8 @@ import {
   runMicrobench,
   evaluatePerfGates,
   startRunner,
+  compareBudgets,
+  optimizeForBudget,
 } from "./index.js";
 import { BUILTIN_CORPUS as CORPUS } from "../corpus/index.js";
 
@@ -57,7 +59,7 @@ describe("CU accounting", () => {
 });
 
 describe("Governors + adaptive concurrency", () => {
-  it("ECO is serial; MAX is capped", () => {
+  it("ECO is serial; MAX defaults high concurrency", () => {
     expect(resolveGovernor("ECO").maxConcurrency).toBe(1);
     expect(resolveGovernor("MAX").maxConcurrency).toBe(16);
     const conc = recommendConcurrency({
@@ -69,6 +71,11 @@ describe("Governors + adaptive concurrency", () => {
     expect(conc).toBeLessThanOrEqual(4);
   });
 
+  it("allows CU overrides above governor baseline (Supercharger II)", () => {
+    const g = resolveGovernor("ECO", { maxCu: 50_000 });
+    expect(g.maxCu).toBe(50_000);
+  });
+
   it("backs off under rate-limit pressure", () => {
     const conc = recommendConcurrency({
       cpus: 16,
@@ -77,6 +84,34 @@ describe("Governors + adaptive concurrency", () => {
       rateLimitRemaining: 2,
     });
     expect(conc).toBe(1);
+  });
+});
+
+describe("Optimizer — CU budget selects different work", () => {
+  const testIds = CORPUS.map((t) => t.id);
+
+  it("higher CU selects more packages and deeper verification", () => {
+    const { low, high, addedPackages, depthIncreased } = compareBudgets(
+      5,
+      500,
+      { testIds, includeRemote: false },
+    );
+    expect(low.selected).toContain("required_parity");
+    expect(high.selected.length).toBeGreaterThan(low.selected.length);
+    expect(addedPackages.length).toBeGreaterThan(0);
+    expect(depthIncreased || addedPackages.length > 0).toBe(true);
+    expect(high.estimatedCu).toBeGreaterThan(low.estimatedCu);
+  });
+
+  it("scarce CU defers research/fuzz packages", () => {
+    const scarce = optimizeForBudget({
+      budgetCu: 8,
+      testIds,
+      includeRemote: false,
+    });
+    expect(scarce.deferred).toEqual(
+      expect.arrayContaining(["differential_fuzz", "research_swarm"]),
+    );
   });
 });
 

@@ -17,6 +17,7 @@ export * from "./minimizer.js";
 export * from "./matrix.js";
 export * from "./runner.js";
 export * from "./plan.js";
+export * from "./optimizer.js";
 export * from "./accelerate.js";
 export * from "./benchmark.js";
 export * from "./gates.js";

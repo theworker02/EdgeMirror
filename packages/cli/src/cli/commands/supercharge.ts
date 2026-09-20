@@ -42,12 +42,20 @@ export function registerSuperchargeCommand(program: Command): void {
 
   cmd
     .command("plan")
-    .description("Estimate Supercharger job DAG (estimates only)")
+    .description("Estimate Supercharger job DAG; CU budget changes selected work")
     .option("--mode <mode>", "ECO|BALANCED|FAST|MAX", "BALANCED")
+    .option("--cu <n>", "CU budget override (accounting — not currency)")
     .option("--remote", "Include remote prepare/execute jobs in the plan")
     .option("--filter <pattern>", "Filter corpus tests")
     .option("--json", "Print JSON plan")
-    .action((opts: { mode?: string; remote?: boolean; filter?: string; json?: boolean }) => {
+    .action(
+      (opts: {
+        mode?: string;
+        cu?: string;
+        remote?: boolean;
+        filter?: string;
+        json?: boolean;
+      }) => {
       const cwd = process.cwd();
       let testIds: string[];
       try {
@@ -71,10 +79,12 @@ export function registerSuperchargeCommand(program: Command): void {
           );
         }
       }
+      const maxCu = opts.cu ? Number(opts.cu) : undefined;
       const plan = buildSuperchargePlan({
         testIds,
         includeRemote: Boolean(opts.remote),
         mode: (opts.mode ?? "BALANCED").toUpperCase() as GovernorMode,
+        maxCu: Number.isFinite(maxCu) ? maxCu : undefined,
       });
       if (opts.json) {
         console.log(JSON.stringify(plan, null, 2));

@@ -1,5 +1,8 @@
 /**
  * Governor modes — explicit resource ceilings.
+ *
+ * Explicit maxCu / maxConcurrency / maxWallMs overrides may EXCEED the mode
+ * baseline. Modes are defaults, not hard caps on authorized budgets.
  */
 
 import type { GovernorLimits, GovernorMode } from "./types.js";
@@ -21,13 +24,13 @@ const GOVERNORS: Record<GovernorMode, Omit<GovernorLimits, "mode">> = {
     maxConcurrency: 8,
     maxCu: 500,
     maxWallMs: 30 * 60_000,
-    description: "Higher concurrency for large local matrices; still capped.",
+    description: "Higher concurrency for large local matrices; still capped by overrides.",
   },
   MAX: {
     maxConcurrency: 16,
-    maxCu: 2000,
+    maxCu: 2_000,
     maxWallMs: 60 * 60_000,
-    description: "Highest local ceiling — still respects explicit overrides.",
+    description: "Highest local default — still respects explicit overrides (may exceed).",
   },
 };
 
@@ -36,15 +39,13 @@ export function resolveGovernor(
   overrides?: { maxConcurrency?: number; maxCu?: number; maxWallMs?: number },
 ): GovernorLimits {
   const base = GOVERNORS[mode];
+  // Overrides raise or lower the ceiling; they are not clamped to base.maxCu.
   const maxConcurrency = Math.max(
     1,
-    Math.min(base.maxConcurrency, overrides?.maxConcurrency ?? base.maxConcurrency),
+    overrides?.maxConcurrency ?? base.maxConcurrency,
   );
-  const maxCu = Math.max(1, Math.min(base.maxCu, overrides?.maxCu ?? base.maxCu));
-  const maxWallMs = Math.max(
-    1_000,
-    Math.min(base.maxWallMs, overrides?.maxWallMs ?? base.maxWallMs),
-  );
+  const maxCu = Math.max(1, overrides?.maxCu ?? base.maxCu);
+  const maxWallMs = Math.max(1_000, overrides?.maxWallMs ?? base.maxWallMs);
   return {
     mode,
     maxConcurrency,
