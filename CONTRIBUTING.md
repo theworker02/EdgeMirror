@@ -24,7 +24,8 @@ Useful scripts (root `package.json`):
 
 | Script | Purpose |
 |--------|---------|
-| `npm run build` | Build `@edgemirror/cli` and `@edgemirror/vitest` |
+| `npm run build` | Build `edgemirror` CLI and workspace packages |
+| `npm run gate:distribution` | Pack CLI tarball; install into blank Worker; doctor + verify |
 | `npm test` | CLI test suite |
 | `npm run test:unit` | Unit tests under `packages/cli/src` |
 | `npm run typecheck` | Typecheck workspaces |

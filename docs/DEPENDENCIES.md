@@ -9,7 +9,7 @@ Inventory of EdgeMirror’s direct dependencies for technical diligence. Version
 | Node.js | `>=20` |
 | Wrangler / workerd | Invoked via project / `npx wrangler` (devDependency on CLI package for local testing) |
 
-## `@edgemirror/cli` dependencies
+## `edgemirror` (CLI package) dependencies
 
 | Package | Role |
 |---------|------|
@@ -18,7 +18,7 @@ Inventory of EdgeMirror’s direct dependencies for technical diligence. Version
 | `picocolors` | Terminal styling |
 | `zod` | Config schema validation |
 
-### `@edgemirror/cli` devDependencies
+### `edgemirror` CLI devDependencies
 
 | Package | Role |
 |---------|------|

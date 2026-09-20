@@ -198,16 +198,27 @@ npm install
 npm run build
 npm test
 
-# In a Worker project
+# Pack without publishing (proves installability)
+npm run pack:cli
+# → edgemirror-0.1.0.tgz
+
+# In a Worker project (tarball today; npmjs.com later)
+npm install -D ./edgemirror-0.1.0.tgz   # or: npm install -D edgemirror  (when published)
 npx edgemirror init
+npx edgemirror verify
 ```
 
-Published npm timing for `@edgemirror/cli` is tracked separately by release engineering — prefer workspace `npx` / linked bin until publish is confirmed.
+Canonical public identity is the **unscoped** package `edgemirror` on npmjs.com — not GitHub Packages and not a personal `@user/` scope. See [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md). Prove a clean install with:
+
+```bash
+npm run gate:distribution
+```
 
 ## Documentation
 
 | Doc | Description |
 |-----|-------------|
+| [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md) | Package identity, pack/publish, transfer notes |
 | [docs/site/](./docs/site/) | Docs-site hierarchy (Getting Started → Troubleshooting) |
 | [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System design |
 | [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) | Common failures |

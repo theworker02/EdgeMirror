@@ -1,5 +1,5 @@
 /**
- * Public library exports for @edgemirror/cli
+ * Public library exports for the `edgemirror` package.
  */
 
 export { EDGEMIRROR_VERSION } from "./version.js";

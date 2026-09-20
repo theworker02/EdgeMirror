@@ -29,5 +29,5 @@ This document is for technical diligence only — not a business plan.
 
 - Broader binding instrumentation (DO/Queue/D1 deep traces)
 - Credentialed CI demo project
-- Package publishing pipeline (`@edgemirror/cli` npm release)
+- Package publishing pipeline (unscoped `edgemirror` on npmjs.com; see `docs/DISTRIBUTION.md` and `npm run gate:distribution`)
 - Compatibility matrix expansion and version-skew workflows
