@@ -11,10 +11,8 @@ import {
   headersFromFetch,
   unavailable,
 } from "../trace/factory.js";
-import {
-  resolveWranglerBin,
-  writeCompatDateOverlay,
-} from "../adapters/cloudflare/wrangler.js";
+import { writeCompatDateOverlay } from "../adapters/cloudflare/wrangler.js";
+import { spawnWranglerSafe } from "../security/spawn.js";
 
 async function getFreePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -48,7 +46,6 @@ export class LocalExecutionTarget implements ExecutionTarget {
   async prepare(): Promise<void> {
     this.port = await getFreePort();
     this.baseUrl = `http://127.0.0.1:${this.port}`;
-    const { cmd, argsPrefix } = resolveWranglerBin();
 
     this.effectiveConfigPath = this.ctx.wranglerConfigPath;
     if (this.ctx.compatibilityDateOverride) {
@@ -60,7 +57,6 @@ export class LocalExecutionTarget implements ExecutionTarget {
     }
 
     const args = [
-      ...argsPrefix,
       "dev",
       "--local",
       "--ip",
@@ -71,18 +67,10 @@ export class LocalExecutionTarget implements ExecutionTarget {
       this.effectiveConfigPath,
     ];
 
-    this.child = spawn(cmd, args, {
-      cwd: this.ctx.projectRoot,
-      env: {
-        ...process.env,
-        WRANGLER_SEND_METRICS: "false",
-        CI: "true",
-      },
+    const { child } = spawnWranglerSafe(this.ctx.projectRoot, args, {
       stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
     });
-
+    this.child = child;
     this.child.stdout?.on("data", (chunk: Buffer) => {
       this.stdout += chunk.toString("utf8");
     });

@@ -12,6 +12,7 @@ on:
 jobs:
   edgemirror:
     runs-on: ubuntu-latest
+    # Least privilege: contents read only. Do not grant secrets to fork PRs.
     permissions:
       contents: read
     steps:
@@ -30,9 +31,10 @@ jobs:
 
       - name: EdgeMirror verify (local)
         # Remote/preview require secrets — omit rather than fabricate results.
+        # Fork PRs must not receive CLOUDFLARE_* or runner tokens.
         run: npx edgemirror verify --local --ci --format agent
         env:
-          # Optional — when set, remove --local to enable remote parity:
+          # Optional — only on trusted (non-fork) refs; remove --local to enable remote:
           # CLOUDFLARE_API_TOKEN: \${{ secrets.CLOUDFLARE_API_TOKEN }}
           # CLOUDFLARE_ACCOUNT_ID: \${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CI: true

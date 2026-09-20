@@ -51,3 +51,5 @@ export {
   type SuperchargeOptions,
   type GovernorMode,
 } from "./supercharger/index.js";
+export * from "./security/index.js";
+export { redactString, redactDeep } from "./privacy/index.js";

@@ -2,43 +2,16 @@
  * Shared Wrangler/workerd helpers for Cloudflare adapters.
  */
 
-import { spawn } from "node:child_process";
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
-
-export function resolveWranglerBin(): { cmd: string; argsPrefix: string[] } {
-  return {
-    cmd: process.platform === "win32" ? "npx.cmd" : "npx",
-    argsPrefix: ["wrangler"],
-  };
-}
+import { runWranglerSafe } from "../../security/spawn.js";
 
 export function runWrangler(
   args: string[],
   cwd: string,
-  env: NodeJS.ProcessEnv = process.env,
+  _env: NodeJS.ProcessEnv = process.env,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  return new Promise((resolve) => {
-    const { cmd, argsPrefix } = resolveWranglerBin();
-    const child = spawn(cmd, [...argsPrefix, ...args], {
-      cwd,
-      env: { ...env, WRANGLER_SEND_METRICS: "false", CI: "true" },
-      stdio: ["ignore", "pipe", "pipe"],
-      windowsHide: true,
-      shell: process.platform === "win32",
-    });
-    let stdout = "";
-    let stderr = "";
-    child.stdout?.on("data", (c: Buffer) => {
-      stdout += c.toString("utf8");
-    });
-    child.stderr?.on("data", (c: Buffer) => {
-      stderr += c.toString("utf8");
-    });
-    child.on("close", (code) => {
-      resolve({ code: code ?? 1, stdout, stderr });
-    });
-  });
+  return runWranglerSafe(cwd, args);
 }
 
 /**

@@ -1,6 +1,11 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import {
+  assertOwnedResourceSafe,
+  attachOwnershipMac,
+  OwnershipGuardError,
+} from "../security/ownership-guard.js";
 
 export type OwnedResourceType =
   | "worker"
@@ -27,14 +32,16 @@ export function claimResource(input: {
   metadata?: Record<string, unknown>;
 }): OwnedResource {
   mkdirSync(input.ownershipDir, { recursive: true });
-  const resource: OwnedResource = {
+  const resource = attachOwnershipMac({
     id: randomUUID(),
     type: input.type,
     name: input.name,
     createdAt: new Date().toISOString(),
     edgemirrorOwned: true,
     metadata: input.metadata ?? {},
-  };
+  });
+  // Fail closed at claim time if name is not an EdgeMirror temp resource.
+  assertOwnedResourceSafe(resource);
   writeFileSync(
     join(input.ownershipDir, `${resource.id}.json`),
     JSON.stringify(resource, null, 2),
@@ -56,6 +63,7 @@ export function listOwnedResources(ownershipDir: string): OwnedResource[] {
 
 /**
  * Only deletes resources EdgeMirror can prove it owns via ownership markers.
+ * Markers that fail name/MAC checks are skipped (not deleted).
  */
 export async function cleanupOwnedResources(
   ownershipDir: string,
@@ -69,6 +77,14 @@ export async function cleanupOwnedResources(
   for (const resource of owned) {
     if (resource.cleanedAt) {
       skipped.push(`${resource.type}:${resource.name} (already cleaned)`);
+      continue;
+    }
+    try {
+      assertOwnedResourceSafe(resource);
+    } catch (err) {
+      const reason =
+        err instanceof OwnershipGuardError ? err.message : "ownership guard failed";
+      skipped.push(`${resource.type}:${resource.name} (${reason})`);
       continue;
     }
     try {

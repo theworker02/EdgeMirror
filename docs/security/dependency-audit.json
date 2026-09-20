@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-09-20T01:26:40.109Z",
+  "skipped": false,
+  "critical": 0,
+  "high": 0,
+  "moderate": 0,
+  "low": 0,
+  "info": 0,
+  "advisories": [],
+  "note": "Informational dependency audit. Not a SOC 2 or certification claim."
+}

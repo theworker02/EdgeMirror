@@ -6,6 +6,9 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ParityTest } from "../trace/schema.js";
+import { PathEscapeError, resolveContained } from "../security/paths.js";
+import { sanitizeRequestPath, UrlSafetyError } from "../security/url.js";
+import { assertRequestBodySize } from "../security/limits.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -62,28 +65,67 @@ export const BUILTIN_CORPUS: ParityTest[] = [
   },
 ];
 
+function sanitizeLoadedTests(tests: ParityTest[]): ParityTest[] {
+  return tests.map((t) => {
+    try {
+      const path = sanitizeRequestPath(t.request.path);
+      assertRequestBodySize(t.request.body);
+      return { ...t, request: { ...t.request, path } };
+    } catch (err) {
+      if (err instanceof UrlSafetyError) {
+        throw new UrlSafetyError(`Corpus test ${t.id}: ${err.message}`);
+      }
+      throw err;
+    }
+  });
+}
+
 export function loadCorpusFromPath(path: string): ParityTest[] {
   if (!existsSync(path)) return [];
   const raw = JSON.parse(readFileSync(path, "utf8")) as
     | ParityTest[]
     | { tests: ParityTest[] };
-  return Array.isArray(raw) ? raw : raw.tests ?? [];
+  const tests = Array.isArray(raw) ? raw : raw.tests ?? [];
+  return sanitizeLoadedTests(tests);
 }
 
-export function loadCorpusPaths(paths: string[]): ParityTest[] {
+/**
+ * Load corpus files. When `projectRoot` is set, paths must resolve inside it.
+ */
+export function loadCorpusPaths(
+  paths: string[],
+  projectRoot?: string,
+): ParityTest[] {
   const tests: ParityTest[] = [];
   for (const p of paths) {
-    if (!existsSync(p)) continue;
+    let resolved = p;
+    if (projectRoot) {
+      try {
+        resolved = resolveContained(projectRoot, p);
+      } catch (err) {
+        if (err instanceof PathEscapeError) {
+          throw err;
+        }
+        throw err;
+      }
+    }
+    if (!existsSync(resolved)) continue;
     // directory of json files or single file
     try {
-      const stat = readdirSync(p, { withFileTypes: true });
+      const stat = readdirSync(resolved, { withFileTypes: true });
       for (const entry of stat) {
         if (entry.isFile() && entry.name.endsWith(".json")) {
-          tests.push(...loadCorpusFromPath(join(p, entry.name)));
+          const filePath = projectRoot
+            ? resolveContained(projectRoot, join(resolved, entry.name))
+            : join(resolved, entry.name);
+          tests.push(...loadCorpusFromPath(filePath));
         }
       }
-    } catch {
-      tests.push(...loadCorpusFromPath(p));
+    } catch (err) {
+      if (err instanceof PathEscapeError || err instanceof UrlSafetyError) {
+        throw err;
+      }
+      tests.push(...loadCorpusFromPath(resolved));
     }
   }
   return tests;
@@ -97,13 +139,15 @@ export function selectTests(input: {
   includeBuiltin: boolean;
   paths?: string[];
   filter?: string;
+  /** When set, corpus paths are constrained to this root. */
+  projectRoot?: string;
 }): ParityTest[] {
   const tests: ParityTest[] = [];
   if (input.includeBuiltin) {
-    tests.push(...BUILTIN_CORPUS);
+    tests.push(...sanitizeLoadedTests(BUILTIN_CORPUS));
   }
   if (input.paths?.length) {
-    tests.push(...loadCorpusPaths(input.paths));
+    tests.push(...loadCorpusPaths(input.paths, input.projectRoot));
   }
   if (!input.filter) return tests;
   const f = input.filter.toLowerCase();

@@ -143,7 +143,11 @@ describe("config + privacy + ownership", () => {
 
   it("only cleans EdgeMirror-owned resources", async () => {
     const dir = mkdtempSync(join(tmpdir(), "em-own-"));
-    claimResource({ ownershipDir: dir, type: "worker", name: "em-tmp-1" });
+    claimResource({
+      ownershipDir: dir,
+      type: "worker",
+      name: "edgemirror-tmp-abcd1234",
+    });
     expect(listOwnedResources(dir)).toHaveLength(1);
     const result = await cleanupOwnedResources(dir, async () => true);
     expect(result.cleaned).toHaveLength(1);

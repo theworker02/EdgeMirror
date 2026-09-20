@@ -135,8 +135,9 @@ export async function runParitySuite(
     options.tests ??
     selectTests({
       includeBuiltin: config.corpus.includeBuiltin,
-      paths: config.corpus.paths.map((p) => join(discovered.projectRoot, p)),
+      paths: config.corpus.paths,
       filter: options.filter,
+      projectRoot: discovered.projectRoot,
     });
 
   // Selection modes (--fast/--full/--nightly/incremental) work even without scheduler.

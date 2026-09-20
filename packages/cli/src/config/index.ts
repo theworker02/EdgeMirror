@@ -2,10 +2,19 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import yaml from "js-yaml";
 import { z } from "zod";
+import {
+  clampRemoteBudget,
+  HARD_MAX_REMOTE_DURATION_MINUTES,
+  HARD_MAX_REMOTE_RUNS,
+} from "../security/limits.js";
 
 const RemoteBudgetSchema = z.object({
-  maxRuns: z.number().int().positive().default(200),
-  maxDurationMinutes: z.number().positive().default(15),
+  maxRuns: z.number().int().positive().max(HARD_MAX_REMOTE_RUNS).default(200),
+  maxDurationMinutes: z
+    .number()
+    .positive()
+    .max(HARD_MAX_REMOTE_DURATION_MINUTES)
+    .default(15),
   cleanup: z.boolean().default(true),
 });
 
@@ -73,7 +82,16 @@ export function loadConfig(projectRoot: string): EdgeMirrorConfig {
           ]),
         )
       : {};
-  return EdgeMirrorConfigSchema.parse(normalized ?? {});
+  const parsed = EdgeMirrorConfigSchema.parse(normalized ?? {});
+  const clamped = clampRemoteBudget(parsed.remote);
+  return {
+    ...parsed,
+    remote: {
+      ...parsed.remote,
+      maxRuns: clamped.maxRuns,
+      maxDurationMinutes: clamped.maxDurationMinutes,
+    },
+  };
 }
 
 export function writeDefaultConfig(projectRoot: string): string {

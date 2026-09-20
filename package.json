@@ -13,6 +13,7 @@
     "test:billing": "npm run build -w @edgemirror/organizations && npm run build -w @edgemirror/billing && npm run test -w @edgemirror/organizations && npm run test -w @edgemirror/billing && npm run test -w @edgemirror/api",
     "test:unit": "npm run test:unit -w @edgemirror/cli",
     "test:cloudflare-live": "npm run test:cloudflare-live -w @edgemirror/cli",
+    "test:security": "npm run test -w @edgemirror/cli -- tests/adversarial-security.test.ts",
     "test:e2e": "node scripts/golden-path-e2e.mjs",
     "lint": "npm run lint -w @edgemirror/cli",
     "edgemirror": "node packages/cli/dist/cli/bin.js",
@@ -22,6 +23,8 @@
     "check:changelog": "node scripts/check-changelog.mjs",
     "validate:docs": "node scripts/validate-docs.mjs",
     "gate:security": "node scripts/security-gate.mjs",
+    "security:sbom": "node scripts/sbom-generate.mjs",
+    "security:audit": "node scripts/dependency-audit.mjs",
     "release:receipt": "node scripts/generate-release-receipt.mjs --run-gates",
     "ci:local": "npm run check:versions && npm run check:changelog && npm run lint && npm run typecheck && npm run test:unit && npm test && npm run gate:security && npm run build && npm run validate:docs && npm run test:e2e"
   },
