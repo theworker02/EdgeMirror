@@ -27,11 +27,11 @@ Work owned by parallel sprint agents — treat as unstable until merged by relea
 
 | Area | Owner | Notes |
 |------|-------|-------|
-| Brand / README visuals | Agent 1 | Asset hooks in `docs/assets/` |
-| Live Cloudflare adapters / support report | Agent 2 | Docs mark UNKNOWN until report lands |
+| Brand / README visuals | Agent 1 | **COMPLETE** on `agent/brand` — wired into docs README |
+| Live Cloudflare adapters / support report | Agent 2 | **COMPLETE** on `agent/cloudflare` — matrix documented from support report |
 | Security hardening suite | Agent 3 | Extends SECURITY / THREAT_MODEL |
 | Supercharger performance layer | Agent 5 | Optional; CU ≠ crypto |
-| Release gates / package publish | Agent 6 | npm timing TBD |
+| Release gates / package publish | Agent 6 | npm timing TBD; merge coordination |
 
 ## PLANNED
 
