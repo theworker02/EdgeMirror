@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" role="img" aria-label="Supercharger visual stub">
+  <rect width="720" height="280" fill="#0c1116"/>
+  <text x="32" y="40" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="18" font-weight="600" fill="#e8eef2">Supercharger</text>
+  <text x="32" y="64" font-family="IBM Plex Mono, monospace" font-size="12" fill="#c47ac0">VISUAL STUB  no performance claims</text>
+  <rect x="32" y="120" width="656" height="12" fill="#1a232c" stroke="#243040"/>
+  <rect x="32" y="120" width="0" height="12" fill="#3dbaa8"/>
+  <text x="32" y="160" font-family="IBM Plex Mono, monospace" font-size="13" fill="#8a9aa6">Not connected · 0%</text>
+  <text x="32" y="200" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="13" fill="#8a9aa6">Gauge component for Agent 5 engine integration  brand-owned chrome only.</text>
+</svg>

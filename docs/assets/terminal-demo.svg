@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" role="img" aria-label="EdgeMirror terminal demo (static SVG stand-in)">
+  <rect width="880" height="480" rx="8" fill="#0c1116" stroke="#243040"/>
+  <circle cx="28" cy="24" r="6" fill="#3a4550"/><circle cx="48" cy="24" r="6" fill="#3a4550"/><circle cx="68" cy="24" r="6" fill="#3a4550"/>
+  <text x="100" y="28" font-family="IBM Plex Mono, monospace" font-size="12" fill="#8a9aa6">edgemirror verify  DEMO capture</text>
+  <g font-family="IBM Plex Mono, monospace" font-size="13" fill="#e8eef2">
+    <text x="24" y="72" fill="#3dbaa8">$</text><text x="40" y="72">edgemirror verify --local</text>
+    <text x="24" y="108" font-weight="600">EdgeMirror 0.1.0</text><text x="180" y="108" fill="#8a9aa6">  run local-demo</text>
+    <text x="24" y="140" font-weight="600">Checks</text>
+    <text x="24" y="168" fill="#3dbaa8">[VERIFIED]</text><text x="130" y="168">  Local runtime fingerprint</text>
+    <text x="24" y="192" fill="#c4a56a">[BLOCKED]</text><text x="130" y="192">  Remote parity  REMOTE_NOT_CONFIGURED</text>
+    <text x="24" y="228" font-weight="600">Parity results</text>
+    <text x="24" y="256" fill="#3dbaa8">[VERIFIED]</text><text x="130" y="256">  http-get-root  MATCH  conf=1.00</text>
+    <text x="24" y="292" font-weight="600">Score</text>
+    <text x="24" y="320" fill="#8a9aa6">  overall ............... n/a (local-only)</text>
+    <text x="24" y="344" fill="#8a9aa6">  matched ............... 1</text>
+    <text x="24" y="368" fill="#8a9aa6">  remote not configured .. 0</text>
+    <text x="24" y="412" fill="#c47ac0">Static SVG stand-in for terminal-demo.gif  regenerate from real CLI when recording.</text>
+  </g>
+</svg>
