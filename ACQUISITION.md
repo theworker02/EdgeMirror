@@ -1,9 +1,9 @@
 # EdgeMirror — Acquisition brief
 
 **For:** Cloudflare corporate development / product partnerships  
-**Repository:** https://github.com/theworker02/EdgeMirror (public, Apache-2.0)  
+**Repository:** https://github.com/theworker02/EdgeMirror (public, source-available proprietary)  
 **Demo site:** https://theworker02.github.io/EdgeMirror/  
-**Status:** Independent open-source project — **not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.**
+**Status:** Independent source-available project — **not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.** Commercial licenses available — see [`COMMERCIAL.md`](./COMMERCIAL.md).
 
 ## One-sentence pitch
 
@@ -55,6 +55,6 @@ For acquisition or partnership conversations, open a private channel via the Git
 
 “Cloudflare” and “Workers” are trademarks of Cloudflare, Inc. EdgeMirror uses them only to describe compatibility targets. No logo misuse, no “official Cloudflare product” wording.
 
-## License
+## License / commercial IP
 
-Apache License 2.0 — see [`LICENSE`](./LICENSE).
+EdgeMirror is **source-available proprietary** software (not Apache-2.0 / not OSI open source). Public source supports diligence and evaluation; production, redistribution, SaaS, and other commercial use require a paid commercial license ([`COMMERCIAL.md`](./COMMERCIAL.md)). Acquisition or partnership can include assignment or exclusive licensing of that commercial IP under negotiated terms — see [`LICENSE`](./LICENSE), [`NOTICE`](./NOTICE), and [`LICENSE_TRANSITION_NOTICE.md`](./LICENSE_TRANSITION_NOTICE.md) (enforcement rights for post-transition code may pass to an acquirer/successor; historical Apache-2.0 grants for prior copies are not claimed revoked).

@@ -32,4 +32,4 @@ See the [repository README](https://github.com/theworker02/EdgeMirror) and [docs
 
 ## License
 
-Apache-2.0
+Source-available proprietary — see repository [LICENSE](../../LICENSE) and [COMMERCIAL.md](../../COMMERCIAL.md).

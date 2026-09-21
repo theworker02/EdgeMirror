@@ -8,9 +8,9 @@ Technical diligence packet for evaluators. Not a valuation or term sheet.
 |------|------|
 | Problem | Local Cloudflare Workers behavior can diverge from production; teams lack differential **evidence** |
 | Approach | Same corpus on local workerd and remote/preview; normalize; diff; classify; emit `EM-###` receipts |
-| Primary artifact | CLI `edgemirror` (unscoped package name; Apache-2.0) |
+| Primary artifact | CLI `edgemirror` (unscoped package name; source-available proprietary) |
 | Honesty rule | Missing credentials → `REMOTE_NOT_CONFIGURED` — never fabricated remote traces |
-| Non-goals (current OSS) | Replacing Wrangler deploy; multi-cloud production; automatic upstream bug filing |
+| Non-goals (current public tree) | Replacing Wrangler deploy; multi-cloud production; automatic upstream bug filing |
 
 ## Engineering maturity
 
@@ -29,7 +29,7 @@ Technical diligence packet for evaluators. Not a valuation or term sheet.
 
 - Wrangler / workerd CLI behavior and Cloudflare API availability
 - Node.js ≥ 20
-- Optional Stripe keys only for hosted Cloud catalog (not required for OSS verify)
+- Optional Stripe keys only for hosted Cloud catalog (not required for CLI verify)
 
 ## Open items (honest)
 

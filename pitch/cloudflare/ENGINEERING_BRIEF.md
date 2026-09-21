@@ -15,7 +15,7 @@ EdgeMirror runs the same parity corpus against local and remote/preview targets,
 
 ## Architecture (summary)
 
-CLI-first engine (`edgemirror`): discovery → execution targets → traces → normalize/diff → provenance → ownership-tracked cleanup. Optional Supercharger and hosted Cloud do not gate OSS verify.
+CLI-first engine (`edgemirror`): discovery → execution targets → traces → normalize/diff → provenance → ownership-tracked cleanup. Optional Supercharger and hosted Cloud do not gate CLI verify.
 
 Details: `docs/ARCHITECTURE.md`.
 
@@ -45,7 +45,7 @@ Built-in HTTP corpus plus project corpus paths (e.g. bindings fixture). DEMO / p
 
 ## Supercharger
 
-Optional CU budget optimizer — selects different work packages by budget density. **Compute Units are accounting meters — not cryptocurrency.** OSS verify works without Supercharger.
+Optional CU budget optimizer — selects different work packages by budget density. **Compute Units are accounting meters — not cryptocurrency.** CLI verify works without Supercharger.
 
 ## Security
 

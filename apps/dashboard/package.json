@@ -7,5 +7,5 @@
     "build": "node scripts/build.mjs",
     "start": "npx --yes serve public -p 4173"
   },
-  "license": "Apache-2.0"
+  "license": "SEE LICENSE IN LICENSE"
 }

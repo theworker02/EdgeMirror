@@ -4,17 +4,20 @@
 
 **Know before you deploy.**
 
-Production confidence for Cloudflare Workers — does this app behave the same locally as on the real Cloudflare platform?
+The evidence layer Cloudflare Workers deploys need — differential proof that local workerd ≈ the real platform, before `wrangler deploy`.
 
 **Live Cloudflare demo (static):** [theworker02.github.io/EdgeMirror](https://theworker02.github.io/EdgeMirror/)
 
 ```bash
 npx edgemirror verify
+# Standard gate before deploy:
+npx edgemirror init --cloudflare-gate
+npx edgemirror deploy
 ```
 
-EdgeMirror is an independent open-source project and is **not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.**
+EdgeMirror is an independent **source-available** project (not open source) and is **not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.** Evaluation use is permitted under [`LICENSE`](./LICENSE); production and commercial use require a paid license — see [`COMMERCIAL.md`](./COMMERCIAL.md).
 
-![License](https://img.shields.io/badge/license-Apache%202.0-0e1419?style=flat-square)
+![License](https://img.shields.io/badge/license-Proprietary%20(source--available)-0e1419?style=flat-square)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-1a7a6d?style=flat-square)
 ![Cloudflare Workers](https://img.shields.io/badge/target-Cloudflare%20Workers-F38020?style=flat-square&labelColor=0e1419)
 ![Parity](https://img.shields.io/badge/parity-evidence%20based-3dbaa8?style=flat-square&labelColor=0e1419)
@@ -22,6 +25,18 @@ EdgeMirror is an independent open-source project and is **not affiliated with, e
 
 
 ![EdgeMirror hero — know before you deploy](./docs/assets/hero.svg)
+
+## Platform quality (why this matters)
+
+Cloudflare’s Workers story depends on **trust that local ≈ production**. EdgeMirror owns that differential evidence:
+
+1. **Default CI / deploy gate** — `edgemirror verify` fails on divergence or insufficient evidence; scaffold with `init --cloudflare-gate` and require the check before merge/deploy.
+2. **Wrangler-adjacent deploy path** — `edgemirror deploy` runs verify, then shells out to `wrangler deploy`. Failed verify aborts unless `--force` (loud warning).
+3. **Support escalation** — `edgemirror support-bundle` exports `EM-###` receipts + doctor support-report + compat artifacts for Cloudflare tickets.
+
+Without this class of evidence, teams ship Workers changes **blind** to local/prod drift. EdgeMirror does not invent parity: missing credentials → `REMOTE_NOT_CONFIGURED`.
+
+Acquisition / partnership brief: [ACQUISITION.md](./ACQUISITION.md)
 
 ## What EdgeMirror does
 
@@ -106,12 +121,14 @@ Dashboard UI (when present) is likewise **DEMO-labeled** — do not treat screen
 | `compat` (local matrix)                        | Works; remote matrix not fabricated                                                            |
 | `bundle EM-###`                                | Works                                                                                          |
 | `demo` (isolated labeled DEMO)                 | Works                                                                                          |
-| `init --ci` / `--github`                       | Works                                                                                          |
-| GitHub Action scaffold                         | Works                                                                                          |
+| `init --ci` / `--github` / `--cloudflare-gate` | Works — gold-standard reusable workflow gate |
+| GitHub Action + reusable workflow              | Works — fail on divergence / insufficient evidence |
 | `@edgemirror/vitest`                           | Thin reporter — does not replace Vitest                                                        |
 | Supercharger                                   | CU budget selects different work packages — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) |
 | Hosted EdgeMirror Cloud                        | Catalog/scripts ready; Stripe test catalog + Checkout when keys configured                     |
 | GitHub Pages demo                              | Static Cloudflare pitch landing in `site/`                                                     |
+| `support-bundle` / `escalate`                  | Works — Cloudflare ticket packet (receipts + doctor + compat)                                  |
+| `deploy` (verify-then-wrangler)                | Works — refuses failed verify unless `--force`                                                 |
 
 
 
@@ -122,14 +139,15 @@ Dashboard UI (when present) is likewise **DEMO-labeled** — do not treat screen
 | Command       | Alias | Purpose                                                           |
 | ------------- | ----- | ----------------------------------------------------------------- |
 | *(bare)*      |       | Interactive onboarding (TTY) or safe local verify                 |
-| `init`        |       | `edgemirror.yaml` + `.edgemirror/`; `--github` / `--ci` scaffolds |
+| `init`        |       | `edgemirror.yaml` + `.edgemirror/`; `--github` / `--ci` / `--cloudflare-gate` |
 | `doctor`      |       | Environment / Wrangler fingerprint                                |
 | `verify`      | `v`   | High-level checks; honest skips when remote unavailable           |
 | `test`        |       | Local ↔ remote (or preview) differential corpus                   |
 | `preview`     |       | Local ↔ preview URL differential                                  |
 | `compat`      |       | Compatibility-date local matrix                                   |
 | `bundle <id>` |       | Portable evidence under `.edgemirror/bundles/`                    |
-| `deploy`      |       | `verify` then `wrangler deploy` (never replaces Wrangler)         |
+| `deploy`      |       | `verify` then `wrangler deploy`; `--force` to override (loud)     |
+| `support-bundle` | `escalate` | Cloudflare ticket packet (EM receipts + doctor + compat)     |
 | `demo`        |       | Isolated DEMO Worker with labeled divergence                      |
 
 
@@ -160,15 +178,36 @@ Optional performance layer (scheduler, Compute Units, caching). **Not required**
 
 Details: [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md)
 
-## GitHub Actions
+## GitHub Actions — required gate before deploy
+
+Cloudflare Workers teams should treat EdgeMirror as a **required status check** before merge/deploy:
 
 ```bash
-npx edgemirror init --github
+npx edgemirror init --cloudflare-gate
 # or
+npx edgemirror init --github
 npx edgemirror init --ci
 ```
 
-Composite action: `[integrations/github-actions/verify](./integrations/github-actions/verify/README.md)`
+**Reusable workflow** (call from any Worker repo):
+
+```yaml
+jobs:
+  edgemirror-verify:
+    uses: theworker02/EdgeMirror/.github/workflows/reusable-edgemirror-verify.yml@main
+    with:
+      local-only: true
+```
+
+**Composite action:** [integrations/github-actions/verify](./integrations/github-actions/verify/README.md)
+
+Then deploy only through the verified path:
+
+```bash
+npx edgemirror deploy              # verify → wrangler deploy
+npx edgemirror deploy --force      # loud override — not the default
+npx edgemirror support-bundle      # attach to a Cloudflare support ticket
+```
 
 ## Compatibility testing
 
@@ -246,7 +285,7 @@ npm run gate:distribution
 
 ## For Cloudflare (acquisition / partnership)
 
-EdgeMirror is an **independent** Apache-2.0 project offered for diligence and acquisition conversations. Start here:
+EdgeMirror is an **independent** source-available project offered for diligence, commercial licensing, and acquisition conversations. Start here:
 
 1. [ACQUISITION.md](./ACQUISITION.md) — forward-facing brief  
 2. [docs/ACQUISITION_READINESS.md](./docs/ACQUISITION_READINESS.md) — technical packet  
@@ -278,6 +317,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
-Apache-2.0 — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
-
-Apache-2.0 — see [LICENSE](./LICENSE).
+**Source-available proprietary** — evaluation under [LICENSE](./LICENSE); commercial / production use via [COMMERCIAL.md](./COMMERCIAL.md). See also [NOTICE](./NOTICE) and the [License Transition & Enforcement Notice](./LICENSE_TRANSITION_NOTICE.md) (historical Apache-2.0 vs current proprietary; enforcement by copyright holder and/or acquirer).

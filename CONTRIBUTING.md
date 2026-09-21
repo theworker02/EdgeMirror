@@ -112,4 +112,4 @@ Do not file public issues with exploit details. Contact the repository owner (`t
 
 ## License
 
-Contributions are under Apache-2.0 (see [LICENSE](./LICENSE)).
+EdgeMirror is source-available proprietary software (see [LICENSE](./LICENSE) and [COMMERCIAL.md](./COMMERCIAL.md)). By contributing, you assign or license your contribution to the Licensor as described in LICENSE so it can be relicensed and commercialized. Do not contribute code you cannot grant on those terms.

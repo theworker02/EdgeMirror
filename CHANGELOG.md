@@ -37,7 +37,7 @@ Baseline package version in `package.json` / `@edgemirror/cli@0.1.0`. Two commit
 - GitHub Actions workflow scaffold (`init --github`) and composite action under `integrations/github-actions/verify`
 - Thin Vitest reporter package `@edgemirror/vitest`
 - Architecture, security, threat model, evidence model, Cloudflare integration, adapter spec, acquisition-readiness docs
-- Apache-2.0 license, funding metadata
+- Source-available proprietary license + commercial sales path (`COMMERCIAL.md`), funding metadata
 
 ### Notes
 
