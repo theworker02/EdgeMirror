@@ -231,19 +231,30 @@ npm run gate:distribution
 
 ## Documentation
 
+| Doc | Purpose |
+|-----|---------|
+| [ACQUISITION.md](./ACQUISITION.md) | **Acquisition / partnership brief** for Cloudflare diligence |
+| [docs/ACQUISITION_READINESS.md](./docs/ACQUISITION_READINESS.md) | Technical diligence checklist |
+| [pitch/cloudflare/ENGINEERING_BRIEF.md](./pitch/cloudflare/ENGINEERING_BRIEF.md) | Engineering one-pager |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | System architecture |
+| [docs/CLOUDFLARE_INTEGRATION.md](./docs/CLOUDFLARE_INTEGRATION.md) | Bindings matrix (all STABLE) |
+| [docs/EVIDENCE_MODEL.md](./docs/EVIDENCE_MODEL.md) | Receipts & classification |
+| [docs/SECURITY.md](./docs/SECURITY.md) / [SECURITY.md](./SECURITY.md) | Security policy & trust boundaries |
+| [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md) | Pack / install gate |
+| [docs/site/](./docs/site/) | Doc site sources |
+| Live demo | https://theworker02.github.io/EdgeMirror/ |
 
-| Doc                                                  | Description                                             |
-| ---------------------------------------------------- | ------------------------------------------------------- |
-| [docs/DISTRIBUTION.md](./docs/DISTRIBUTION.md)       | Package identity, pack/publish, transfer notes          |
-| [docs/site/](./docs/site/)                           | Docs-site hierarchy (Getting Started → Troubleshooting) |
-| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)       | System design                                           |
-| [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) | Common failures                                         |
-| [CONTRIBUTING.md](./CONTRIBUTING.md)                 | Clone → tests                                           |
-| [ROADMAP.md](./ROADMAP.md)                           | Shipped vs planned                                      |
-| [CHANGELOG.md](./CHANGELOG.md)                       | From git history                                        |
+## For Cloudflare (acquisition / partnership)
 
+EdgeMirror is an **independent** Apache-2.0 project offered for diligence and acquisition conversations. Start here:
 
+1. [ACQUISITION.md](./ACQUISITION.md) — forward-facing brief  
+2. [docs/ACQUISITION_READINESS.md](./docs/ACQUISITION_READINESS.md) — technical packet  
+3. Contact: GitHub [@theworker02](https://github.com/theworker02)
 
+Demo site acquisition page: https://theworker02.github.io/EdgeMirror/acquisition.html
+
+Also: [docs/TROUBLESHOOTING.md](./docs/TROUBLESHOOTING.md) · [CONTRIBUTING.md](./CONTRIBUTING.md) · [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) · [ROADMAP.md](./ROADMAP.md) · [CHANGELOG.md](./CHANGELOG.md)
 
 ## Benchmarks
 
@@ -255,7 +266,7 @@ CLI-first engine: discovery → execution targets → traces → normalize/diff 
 
 ## Security
 
-Threat model and practices: [docs/SECURITY.md](./docs/SECURITY.md), [docs/THREAT_MODEL.md](./docs/THREAT_MODEL.md). Report issues privately to the repository owner (`theworker02`).
+Threat model and practices: [SECURITY.md](./SECURITY.md), [docs/SECURITY.md](./docs/SECURITY.md), [docs/THREAT_MODEL.md](./docs/THREAT_MODEL.md). Report vulnerabilities privately to [@theworker02](https://github.com/theworker02).
 
 ## Roadmap
 
@@ -266,5 +277,7 @@ Honest statuses in [ROADMAP.md](./ROADMAP.md).
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
+
+Apache-2.0 — see [LICENSE](./LICENSE) and [NOTICE](./NOTICE).
 
 Apache-2.0 — see [LICENSE](./LICENSE).
