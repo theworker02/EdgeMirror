@@ -10,6 +10,7 @@ import { registerPreviewCommand } from "./commands/preview.js";
 import { registerCompatCommand } from "./commands/compat.js";
 import { registerBundleCommand } from "./commands/bundle.js";
 import { registerDeployCommand } from "./commands/deploy.js";
+import { registerSupportBundleCommand } from "./commands/support-bundle.js";
 import {
   registerDemoCommand,
   registerPitchDemoCommand,
@@ -32,18 +33,21 @@ program
   .addHelpText(
     "after",
     `
-${pc.dim("EdgeMirror is an independent open-source project and is not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.")}
+${pc.dim("EdgeMirror is an independent source-available project and is not affiliated with, endorsed by, or sponsored by Cloudflare, Inc.")}
 
 ${pc.bold("Examples")}
   edgemirror                 # interactive onboarding (TTY) or safe local verify
   edgemirror init
   edgemirror init --ci
+  edgemirror init --cloudflare-gate   # gold-standard CI gate before wrangler deploy
   edgemirror doctor
   edgemirror doctor --bindings
   edgemirror verify
   edgemirror verify --supercharge
   edgemirror verify --fast
   edgemirror v --format agent
+  edgemirror deploy          # verify then wrangler deploy (use --force only if you must)
+  edgemirror support-bundle  # attach to Cloudflare tickets (EM receipts + doctor + compat)
   edgemirror demo            # isolated DEMO divergence (never mixes with real corpus)
   edgemirror pitch-demo      # live local + optional Cloudflare preview (<5 min)
   edgemirror demo cloudflare # same as pitch-demo
@@ -71,6 +75,7 @@ registerPreviewCommand(program);
 registerCompatCommand(program);
 registerBundleCommand(program);
 registerDeployCommand(program);
+registerSupportBundleCommand(program);
 registerDemoCommand(program);
 registerPitchDemoCommand(program);
 registerCloudCommand(program);
@@ -90,6 +95,8 @@ async function main(): Promise<void> {
     "matrix",
     "bundle",
     "deploy",
+    "support-bundle",
+    "escalate",
     "demo",
     "pitch-demo",
     "cloud",

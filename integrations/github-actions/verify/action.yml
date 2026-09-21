@@ -1,10 +1,12 @@
 name: EdgeMirror Verify
-description: Run edgemirror verify with honest REMOTE_NOT_CONFIGURED when secrets are absent
+description: >-
+  Cloudflare Workers quality gate — run edgemirror verify before wrangler deploy.
+  Fails on divergence or insufficient evidence; REMOTE_NOT_CONFIGURED when secrets absent.
 author: EdgeMirror
 
 inputs:
   local-only:
-    description: Skip remote/preview execution
+    description: Skip remote/preview execution (honest without CLOUDFLARE_* secrets)
     required: false
     default: "true"
   format:
@@ -27,6 +29,7 @@ runs:
         EDGEMIRROR_LOCAL_ONLY: ${{ inputs.local-only }}
       run: |
         # Inputs are passed via env to avoid shell interpolation / injection.
+        set +e
         FORMAT="${EDGEMIRROR_FORMAT:-agent}"
         case "$FORMAT" in
           terminal|json|agent) ;;
@@ -36,8 +39,18 @@ runs:
         if [ "${EDGEMIRROR_LOCAL_ONLY:-true}" = "true" ]; then
           ARGS+=(--local)
         fi
+        echo "::notice::EdgeMirror quality gate — verify before wrangler deploy"
         if command -v edgemirror >/dev/null 2>&1; then
           edgemirror "${ARGS[@]}"
         else
           npx --yes edgemirror "${ARGS[@]}"
         fi
+        code=$?
+        if [ "$code" -eq 1 ]; then
+          echo "::error::EdgeMirror: confirmed divergence — do not deploy blind"
+        elif [ "$code" -eq 3 ]; then
+          echo "::error::EdgeMirror: insufficient evidence (e.g. REMOTE_NOT_CONFIGURED when remote required)"
+        elif [ "$code" -ne 0 ]; then
+          echo "::error::EdgeMirror: verify failed with exit $code"
+        fi
+        exit "$code"

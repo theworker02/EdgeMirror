@@ -57,13 +57,20 @@ edgemirror bundle EM-001
 
 Produces `.edgemirror/bundles/EM-001.edgemirror/` with `manifest.json` listing each file’s relative path, SHA-256, and byte length.
 
-## Sharing / upstream
+## Sharing / upstream / Cloudflare support
 
 Until EMF/1 (public interchange format) ships:
 
-1. Attach the `.edgemirror` bundle directory (or zip it yourself)
-2. Include `edgemirror verify --format agent` JSON in CI summaries
-3. Do not claim Cloudflare reproduction without the original Worker + Wrangler fingerprint
+1. Prefer **`edgemirror support-bundle`** (alias `escalate`) — writes `.edgemirror/support-bundles/cf-escalation-*/` with:
+   - `CLOUDFLARE_TICKET.md` (summary template)
+   - `support-report.json` + `bindings-matrix.txt`
+   - `doctor-fingerprint.json` (no secrets)
+   - `receipts/EM-###.json` + recent `runs/`
+   - compat/matrix artifacts when present
+   - `manifest.json` (SHA-256 integrity)
+2. Or attach a single finding via `edgemirror bundle EM-001`
+3. Include `edgemirror verify --format agent` JSON in CI summaries
+4. Do not claim Cloudflare reproduction without the original Worker + Wrangler fingerprint
 
 ## Planned (not shipped)
 

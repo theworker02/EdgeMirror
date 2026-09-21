@@ -1,0 +1,95 @@
+# Reusable workflow: Cloudflare Workers quality gate
+# Call from any Worker repo:
+#
+#   jobs:
+#     verify:
+#       uses: theworker02/EdgeMirror/.github/workflows/reusable-edgemirror-verify.yml@main
+#       with:
+#         working-directory: .
+#         local-only: true
+#
+# Independent open-source — not affiliated with Cloudflare, Inc.
+# Fails on divergence (exit 1), config failure (2), or insufficient evidence (3).
+
+name: EdgeMirror Verify (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      working-directory:
+        description: Worker project directory (wrangler config root)
+        type: string
+        required: false
+        default: "."
+      local-only:
+        description: Skip remote/preview when true (honest without CLOUDFLARE_* secrets)
+        type: boolean
+        required: false
+        default: true
+      node-version:
+        description: Node.js version
+        type: string
+        required: false
+        default: "22"
+      format:
+        description: Report format (terminal|json|agent)
+        type: string
+        required: false
+        default: "agent"
+      install-command:
+        description: Dependency install command
+        type: string
+        required: false
+        default: "npm ci"
+      build-command:
+        description: Optional build; empty skips
+        type: string
+        required: false
+        default: "npm run build --if-present"
+    secrets:
+      CLOUDFLARE_API_TOKEN:
+        required: false
+      CLOUDFLARE_ACCOUNT_ID:
+        required: false
+
+jobs:
+  edgemirror-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: npm
+
+      - name: Install
+        run: ${{ inputs.install-command }}
+
+      - name: Build
+        if: inputs.build-command != ''
+        run: ${{ inputs.build-command }}
+
+      - name: EdgeMirror verify (quality gate)
+        uses: theworker02/EdgeMirror/integrations/github-actions/verify@main
+        with:
+          working-directory: ${{ inputs.working-directory }}
+          local-only: ${{ inputs.local-only && 'true' || 'false' }}
+          format: ${{ inputs.format }}
+        env:
+          CI: true
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Upload EdgeMirror evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: edgemirror-evidence
+          path: ${{ inputs.working-directory }}/.edgemirror/
+          if-no-files-found: ignore

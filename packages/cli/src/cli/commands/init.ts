@@ -8,6 +8,8 @@ import {
 } from "../../config/index.js";
 import {
   GITHUB_WORKFLOW_YAML,
+  CLOUDFLARE_GATE_WORKFLOW_YAML,
+  CLOUDFLARE_GATE_README,
   GITLAB_CI_YAML,
   WORKERS_BUILDS_HINT,
 } from "../../integrations/ci-scaffolds.js";
@@ -36,6 +38,44 @@ export function detectCiProvider(root: string): CiProvider {
     return "workers-builds";
   }
   return "unknown";
+}
+
+function writeFileIfAllowed(
+  path: string,
+  contents: string,
+  force: boolean,
+  label: string,
+): boolean {
+  if (existsSync(path) && !force) {
+    console.log(`${label} already exists: ${path} (use --force to overwrite)`);
+    return false;
+  }
+  mkdirSync(join(path, ".."), { recursive: true });
+  writeFileSync(path, contents, "utf8");
+  console.log(`Wrote ${path}`);
+  return true;
+}
+
+function writeCloudflareGate(root: string, force: boolean): void {
+  const workflowDir = join(root, ".github", "workflows");
+  mkdirSync(workflowDir, { recursive: true });
+  writeFileIfAllowed(
+    join(workflowDir, "edgemirror-verify.yml"),
+    CLOUDFLARE_GATE_WORKFLOW_YAML,
+    force,
+    "Cloudflare gate workflow",
+  );
+  writeFileIfAllowed(
+    join(root, ".edgemirror", "CLOUDFLARE_GATE.md"),
+    CLOUDFLARE_GATE_README,
+    force,
+    "Cloudflare gate companion doc",
+  );
+  console.log("");
+  console.log("Cloudflare quality gate scaffolded.");
+  console.log("  Mark the workflow job as a required branch-protection check.");
+  console.log("  Deploy with: npx edgemirror deploy");
+  console.log("  Escalate with: npx edgemirror support-bundle");
 }
 
 function writeCiScaffold(
@@ -95,25 +135,41 @@ export function registerInitCommand(program: Command): void {
       "--ci",
       "Detect CI provider (GitHub Actions / GitLab / Workers Builds) and scaffold",
     )
+    .option(
+      "--cloudflare-gate",
+      "Scaffold the gold-standard Cloudflare Workers quality gate (reusable workflow + companion doc)",
+    )
     .option("--force", "Overwrite existing workflow if present")
-    .action((opts: { github?: boolean; ci?: boolean; force?: boolean }) => {
-      const root = resolveProjectRoot();
-      const configPath = writeDefaultConfig(root);
-      const artifacts = ensureArtifactsDir(root);
-      console.log(`Wrote ${configPath}`);
-      console.log(`Artifacts directory: ${artifacts}`);
+    .action(
+      (opts: {
+        github?: boolean;
+        ci?: boolean;
+        cloudflareGate?: boolean;
+        force?: boolean;
+      }) => {
+        const root = resolveProjectRoot();
+        const configPath = writeDefaultConfig(root);
+        const artifacts = ensureArtifactsDir(root);
+        console.log(`Wrote ${configPath}`);
+        console.log(`Artifacts directory: ${artifacts}`);
 
-      if (opts.ci) {
-        const provider = detectCiProvider(root);
-        console.log(`Detected CI context: ${provider}`);
-        writeCiScaffold(root, provider, Boolean(opts.force));
-      } else if (opts.github) {
-        writeCiScaffold(root, "github", Boolean(opts.force));
-      }
+        if (opts.cloudflareGate) {
+          writeCloudflareGate(root, Boolean(opts.force));
+        } else if (opts.ci) {
+          const provider = detectCiProvider(root);
+          console.log(`Detected CI context: ${provider}`);
+          writeCiScaffold(root, provider, Boolean(opts.force));
+        } else if (opts.github) {
+          writeCiScaffold(root, "github", Boolean(opts.force));
+        }
 
-      console.log("");
-      console.log("Next:");
-      console.log("  edgemirror doctor");
-      console.log("  edgemirror verify --local");
-    });
+        console.log("");
+        console.log("Next:");
+        console.log("  edgemirror doctor");
+        console.log("  edgemirror verify --local");
+        if (!opts.cloudflareGate) {
+          console.log("  edgemirror init --cloudflare-gate   # required CI gate");
+        }
+      },
+    );
 }

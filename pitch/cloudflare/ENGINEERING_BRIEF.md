@@ -61,9 +61,10 @@ Do not cite fabricated divergences. Use `edgemirror pitch-demo` for labeled demo
 
 ## Integration opportunities (technical, non-exclusive)
 
-- CI gates beside Wrangler deploy
+- **Required CI gates** before Wrangler deploy (`init --cloudflare-gate`, reusable workflow)
 - Compatibility-date matrices in PR checks
-- Support workflows that attach `EM-###` evidence bundles
+- Support workflows that attach `edgemirror support-bundle` / `EM-###` evidence
+- Vitest pool correlation via `@edgemirror/vitest` reporter (does not replace CF pool)
 - Potential first-party packaging under Cloudflare developer tooling (subject to acquisition / partnership)
 
 ## Links

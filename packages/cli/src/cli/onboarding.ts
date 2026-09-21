@@ -40,8 +40,8 @@ export const ONBOARDING_MENU: OnboardingMenuItem[] = [
   },
   {
     key: "4",
-    label: "Scaffold CI (GitHub / Workers Builds / GitLab)",
-    command: "edgemirror init --ci",
+    label: "Scaffold Cloudflare quality gate (CI before wrangler deploy)",
+    command: "edgemirror init --cloudflare-gate",
     safeLocal: true,
   },
   {
@@ -58,6 +58,12 @@ export const ONBOARDING_MENU: OnboardingMenuItem[] = [
   },
   {
     key: "7",
+    label: "Export Cloudflare support-bundle (EM receipts + doctor)",
+    command: "edgemirror support-bundle",
+    safeLocal: true,
+  },
+  {
+    key: "8",
     label: "Show help",
     command: "edgemirror --help",
     safeLocal: true,

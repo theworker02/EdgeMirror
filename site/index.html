@@ -39,10 +39,16 @@
           <h1 id="hero-brand" class="brand-display">EdgeMirror</h1>
           <p class="lede">
             Same request. Local workerd on the left. Real Cloudflare preview on
-            the right. Diffed with evidence — never inventing remote results.
+            the right. Diffed with evidence — the quality gate Workers deploys
+            need before <code>wrangler deploy</code>. Never inventing remote results.
           </p>
           <div class="cta-row">
             <a class="cta primary" href="#run">Run pitch-demo</a>
+            <a
+              class="cta ghost"
+              href="https://github.com/theworker02/EdgeMirror#github-actions--required-gate-before-deploy"
+              >CI gate docs</a
+            >
             <a
               class="cta ghost"
               href="https://github.com/theworker02/EdgeMirror"
@@ -122,6 +128,15 @@ cd EdgeMirror && npm install && npm run build</code></pre>
           <li>
             <strong>No invented parity</strong> — missing auth →
             <code>REMOTE_NOT_CONFIGURED</code>, never a fabricated remote trace.
+          </li>
+          <li>
+            <strong>Deploy gate</strong> —
+            <code>edgemirror init --cloudflare-gate</code> +
+            <code>edgemirror deploy</code> (verify before wrangler).
+          </li>
+          <li>
+            <strong>Support packet</strong> —
+            <code>edgemirror support-bundle</code> for Cloudflare tickets.
           </li>
         </ul>
         <p class="disclaimer">

@@ -9,6 +9,24 @@
 
 EdgeMirror is a CLI-first **local ↔ Cloudflare Workers parity engine** that produces differential evidence before deploy — never inventing remote results when credentials are missing.
 
+## Strategic thesis (platform quality)
+
+Cloudflare’s Workers growth story depends on developer **trust that local ≈ production**. Wrangler and workerd are excellent — and still not identical to the production platform. At scale, Cloudflare cannot close that trust gap with docs and anecdotes alone; it needs a **default evidence loop** in CI and deploy paths.
+
+EdgeMirror owns that loop today:
+
+| Dependency surface | Why Cloudflare/platform teams would rely on it |
+|--------------------|------------------------------------------------|
+| Required CI gate | Reusable workflow + `init --cloudflare-gate` fails merge on divergence / insufficient evidence |
+| Deploy path | `edgemirror deploy` = verify-then-`wrangler deploy`; `--force` is loud, not silent |
+| Support escalation | `support-bundle` packages `EM-###` receipts + doctor + compat for tickets |
+| Bindings / compat | STABLE matrix + real local compat-date cells as release-confidence artifacts |
+| Honesty contract | `REMOTE_NOT_CONFIGURED` instead of fabricated MATCH — preserves platform trust |
+
+**Without EdgeMirror-class evidence**, Workers deploys remain under-instrumented: local green, production surprise, support threads without differential receipts. That is a platform quality gap, not a marketing gap.
+
+This brief does **not** claim Cloudflare endorsement, captive usage metrics, or that Cloudflare “cannot function” as a company without this repo. It argues that **closing the local/prod trust gap at scale requires this class of differential evidence in the default developer path** — and EdgeMirror already ships it.
+
 ## Why Cloudflare might care
 
 | Strategic fit | Detail |
@@ -18,12 +36,16 @@ EdgeMirror is a CLI-first **local ↔ Cloudflare Workers parity engine** that pr
 | Platform quality signal | Structured findings (`EM-###` receipts) suitable for CI gates and support escalation |
 | Bindings coverage | Full **STABLE** matrix: HTTP, vars, KV, D1, R2, DO, queues, service bindings, workflows, Hyperdrive, Vectorize, Workers AI, WebSockets, crons |
 | Honesty culture | `REMOTE_NOT_CONFIGURED` instead of fabricated parity — aligns with developer trust |
+| Default path hooks | GitHub reusable workflow, composite action, `init --cloudflare-gate`, `deploy`, `support-bundle` |
 
 ## What ships today
 
 - Public monorepo + GitHub Pages live demo
 - Publishable CLI package identity: `edgemirror` (distribution gate: `npm run gate:distribution`)
 - `verify` / `preview` / `pitch-demo` / `doctor --bindings` / Supercharger CU planner
+- **Cloudflare quality gate:** `.github/workflows/reusable-edgemirror-verify.yml` + `edgemirror init --cloudflare-gate`
+- **Deploy hardening:** `edgemirror deploy` refuses failed verify unless `--force`
+- **Support escalation:** `edgemirror support-bundle` (alias `escalate`)
 - Ownership-tracked throwaway `edgemirror-tmp-*` Workers with cleanup
 - Security docs, threat model, SBOM scripts, adversarial tests
 
@@ -32,6 +54,7 @@ EdgeMirror is a CLI-first **local ↔ Cloudflare Workers parity engine** that pr
 - Hosted multi-tenant Cloud / Stripe catalog (code present; catalog requires operator keys)
 - npm registry publish (gate proven; publish deferred until external dogfood)
 - Any claim of Cloudflare endorsement
+- Fabricated MAU / revenue / “Cloudflare depends on us” metrics
 
 ## Diligence packet (read in order)
 

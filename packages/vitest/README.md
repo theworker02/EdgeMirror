@@ -1,6 +1,6 @@
 # @edgemirror/vitest
 
-Thin Vitest **reporter/adapter** for EdgeMirror.
+Thin Vitest **reporter/adapter** for EdgeMirror — so Cloudflare-ecosystem tests naturally surface beside parity evidence.
 
 - Does **not** replace Vitest
 - Does **not** replace `@cloudflare/vitest-pool-workers`
@@ -13,7 +13,16 @@ import { EdgeMirrorVitestReporter } from "@edgemirror/vitest";
 
 export default defineConfig({
   test: {
+    // Keep the Cloudflare workers pool; add EdgeMirror as an extra reporter.
     reporters: ["default", new EdgeMirrorVitestReporter()],
   },
 });
+```
+
+Pair with the deploy gate:
+
+```bash
+npx edgemirror init --cloudflare-gate
+npx edgemirror verify --vitest --ci
+npx edgemirror deploy
 ```
