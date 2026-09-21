@@ -102,3 +102,7 @@ For acquisition or partnership conversations, open a private channel via the Git
 EdgeMirror is **source-available proprietary** software (not Apache-2.0 / not OSI open source). Public source supports diligence and evaluation; production, redistribution, SaaS, and other commercial use require a paid commercial license ([`COMMERCIAL.md`](./COMMERCIAL.md)).
 
 Acquisition or partnership can include assignment or exclusive licensing of that commercial IP under negotiated terms — see [`LICENSE`](./LICENSE), [`NOTICE`](./NOTICE), and [`LICENSE_TRANSITION_NOTICE.md`](./LICENSE_TRANSITION_NOTICE.md). **If the project is acquired**, the copyright holder and/or the acquirer may take **legal action** against anyone still using **post-transition** EdgeMirror in production or commercially without authorization (without a commercial license under the proprietary terms). Historical Apache-2.0 grants for prior tagged/released copies are **not** claimed revoked.
+
+## Diligence data room
+
+See [`docs/acquisition/`](./docs/acquisition/) (generated 2026-09-21).
