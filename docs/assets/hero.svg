@@ -19,9 +19,9 @@
     <path d="M96 8h56v96H96z" fill="none" stroke="#d4a574" stroke-width="3"/>
     <path d="M110 36h24M110 56h24M110 76h14" stroke="#d4a574" stroke-width="2.5" stroke-linecap="square"/>
   </g>
-  <text x="280" y="195" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="56" font-weight="600" letter-spacing="0.04em" fill="#e8eef2">EdgeMirror</text>
-  <text x="280" y="240" font-family="IBM Plex Sans, Segoe UI, sans-serif" font-size="22" fill="#8a9aa6">Production parity testing for Cloudflare Workers</text>
-  <text x="280" y="280" font-family="IBM Plex Mono, monospace" font-size="14" fill="#5a6a75">Independent OSS  not affiliated with Cloudflare, Inc.</text>
+  <text x="280" y="195" font-family="Segoe UI, Arial, sans-serif" font-size="56" font-weight="600" letter-spacing="0.04em" fill="#e8eef2">EdgeMirror</text>
+  <text x="280" y="240" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#8a9aa6">Know before you deploy — Workers parity evidence</text>
+  <text x="280" y="280" font-family="Consolas, monospace" font-size="14" fill="#5a6a75">Source-available — not affiliated with Cloudflare, Inc.</text>
   <rect x="280" y="310" width="220" height="36" fill="none" stroke="#3dbaa8" stroke-width="1.5"/>
-  <text x="300" y="333" font-family="IBM Plex Mono, monospace" font-size="14" fill="#3dbaa8">$ edgemirror verify</text>
+  <text x="300" y="333" font-family="Consolas, monospace" font-size="14" fill="#3dbaa8">$ edgemirror verify</text>
 </svg>
