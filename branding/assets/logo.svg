@@ -9,5 +9,5 @@
     <path d="M22 10h3M22 16h3M22 22h2" stroke="#d4a574" stroke-width="1.25" stroke-linecap="square"/>
   </g>
   <!-- Wordmark -->
-  <text x="56" y="31" font-family="IBM Plex Sans, Source Sans 3, Segoe UI, sans-serif" font-size="22" font-weight="600" letter-spacing="0.04em" fill="#e8eef2">EdgeMirror</text>
+  <text x="56" y="31" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="0.04em" fill="#e8eef2">EdgeMirror</text>
 </svg>

@@ -8,7 +8,12 @@ Format inspired by [Keep a Changelog](https://keepachangelog.com/). Version tags
 
 ## [Unreleased]
 
-Documentation and professionalization work on branch `agent/docs` (this branch). Product behavior unchanged unless noted in other agents’ branches.
+### Documentation
+
+- Expanded Cloudflare-ready README (problem/solution, STABLE bindings, CI gate, deploy path, support-bundle, Supercharger, commercial/acquisition pointers)
+- Fixed GitHub hero/logo rendering via PNG exports (`docs/assets/hero.png`, `logo.png`); removed corrupt control character from `hero.svg`
+- Published measured Supercharger benchmarks in `docs/BENCHMARKS.md` (microbench + CU 5 vs 500 plan differentiation)
+- Corrected stale “Supercharger not shipped / no public benchmarks” claims across README, ROADMAP, SUPERCHARGER, ARCHITECTURE, site docs
 
 ## [0.1.0] — 2026-09-19
 

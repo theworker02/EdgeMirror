@@ -1,41 +1,38 @@
 # Roadmap
 
-Statuses reflect the repository as of baseline commit `88dd111` (Phase 3 friction) plus documentation on `agent/docs`.
+Statuses reflect the repository on `main` (source-available proprietary EdgeMirror).
 
 | Status | Meaning |
 |--------|---------|
 | **SHIPPED** | Implemented and usable in this repo |
-| **IN DEVELOPMENT** | Actively being built on parallel agent branches — not yet merged/guaranteed |
+| **IN DEVELOPMENT** | Actively being built — not yet guaranteed |
 | **PLANNED** | Intended; not started or only stubs |
 | **RESEARCH** | Exploring; may change or drop |
 
 ## SHIPPED
 
-- CLI vertical slice: `init`, `doctor`, `verify`/`v`, `test`, `preview`, `compat`, `bundle`, `deploy`, `demo`
+- CLI vertical slice: `init`, `doctor`, `verify`/`v`, `test`, `preview`, `compat`, `bundle`, `deploy`, `demo` / `pitch-demo`, `support-bundle`
 - Bare onboarding / safe local auto-verify
 - Local ↔ remote differential engine with normalize/diff/evidence
 - Honest `REMOTE_NOT_CONFIGURED` / insufficient-evidence exit codes
 - Ownership-tracked temporary Worker cleanup
-- GitHub / GitLab / Workers Builds CI scaffolding (`init --ci`, `init --github`)
-- Composite GitHub Action for verify
+- GitHub / GitLab / Workers Builds CI scaffolding (`init --ci`, `init --github`, `init --cloudflare-gate`)
+- Composite GitHub Action + reusable verify workflow
 - `@edgemirror/vitest` thin reporter
-- Fixture Workers + basic HTTP corpus
+- Fixture Workers + basic HTTP corpus + bindings-http STABLE matrix
+- **Supercharger (optional):** DAG scheduler, governors, CU budgets, cache, `supercharge plan|bench|doctor`, measured microbench harness — see [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) and [docs/BENCHMARKS.md](./docs/BENCHMARKS.md)
 
 ## IN DEVELOPMENT
 
-Work owned by parallel sprint agents — treat as unstable until merged by release engineering:
-
-| Area | Owner | Notes |
-|------|-------|-------|
-| Brand / README visuals | Agent 1 | **COMPLETE** on `agent/brand` — wired into docs README |
-| Live Cloudflare adapters / support report | Agent 2 | **COMPLETE** on `agent/cloudflare` — matrix documented from support report |
-| Security hardening suite | Agent 3 | Extends SECURITY / THREAT_MODEL |
-| Supercharger performance layer | Agent 5 | Optional; CU ≠ crypto |
-| Release gates / package publish | Agent 6 | npm timing TBD; merge coordination |
+| Area | Notes |
+|------|-------|
+| Security hardening suite | Extends SECURITY / THREAT_MODEL |
+| Release gates / package publish | npm timing TBD |
+| Hosted Cloud control plane | Catalog/scripts + Stripe test paths when keys configured; not a public multi-tenant product yet |
 
 ## PLANNED
 
-- Broader binding instrumentation (Durable Objects, Queues, D1 deep traces) — quality gated on Agent 2 coverage
+- Broader binding instrumentation depth (Durable Objects, Queues, D1 deep traces) beyond HTTP/WS-observable STABLE coverage
 - EMF/1 public finding format + `reproduce` command
 - Public compatibility explorer / intelligence surface
 - Hosted EdgeMirror Cloud (control plane ≠ execution plane)
@@ -53,7 +50,7 @@ Work owned by parallel sprint agents — treat as unstable until merged by relea
 
 ## Explicit non-goals (near term)
 
-- Fabricating parity %, benchmarks, or adoption metrics
+- Fabricating parity %, unverified benchmarks, or adoption metrics
 - Claiming Cloudflare endorsement or certification
 - Replacing Wrangler as the deployment tool of record
-- Requiring Supercharger or Cloud for OSS `edgemirror verify`
+- Requiring Supercharger or Cloud for evaluation / OSS-path `edgemirror verify`

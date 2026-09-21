@@ -57,7 +57,7 @@ OSS CLI has no external runner pool today. Failures are local Wrangler/process i
 
 ## CU exhausted
 
-CU metering is **not shipped** on the docs baseline. When Supercharger lands, CU remains accounting only (not crypto).
+CU metering ships with optional Supercharger (`edgemirror supercharge plan --cu N`). CU remains accounting only (not crypto). See [SUPERCHARGER.md](./SUPERCHARGER.md) and [BENCHMARKS.md](./BENCHMARKS.md).
 
 ## Sandbox / local boot failure
 

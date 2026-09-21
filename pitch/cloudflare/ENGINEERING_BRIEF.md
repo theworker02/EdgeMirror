@@ -47,6 +47,8 @@ Built-in HTTP corpus plus project corpus paths (e.g. bindings fixture). DEMO / p
 
 Optional CU budget optimizer — selects different work packages by budget density. **Compute Units are accounting meters — not cryptocurrency.** CLI verify works without Supercharger.
 
+Shipped CLI: `edgemirror supercharge plan|bench|doctor`, `verify --supercharge`. Measured synthetic microbench + CU plan differentiation: [`docs/BENCHMARKS.md`](../../docs/BENCHMARKS.md).
+
 ## Security
 
 Ownership-marked temporary resources; redaction before persistence; budgets for remote runs. See `docs/SECURITY.md` and `docs/THREAT_MODEL.md`.

@@ -66,13 +66,14 @@ discover project
 
 <!-- AGENT1:assets docs/assets/architecture-preview.svg -->
 
-## Supercharger (optional, not shipped)
+## Supercharger (optional, shipped)
 
-Planned performance layer: job DAG, adaptive concurrency, content-addressed cache, Compute Unit budgets.
+Performance layer: job DAG, adaptive concurrency, content-addressed cache, Compute Unit budgets, measured microbench harness.
 
 - Must not invalidate parity evidence semantics
-- Must remain optional — `edgemirror verify` works without it
+- Remains optional — `edgemirror verify` works without it
 - CU is **accounting only** (not cryptocurrency)
+- Public numbers: [BENCHMARKS.md](./BENCHMARKS.md)
 
 See [SUPERCHARGER.md](./SUPERCHARGER.md).
 

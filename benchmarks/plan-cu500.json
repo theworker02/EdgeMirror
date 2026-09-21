@@ -1,0 +1,386 @@
+{
+  "schemaVersion": "1.1",
+  "kind": "supercharge-plan",
+  "disclaimer": "ESTIMATES ONLY. Package selection is deterministic from CU budget + value density. Wall times are heuristic — run benchmarks for measurements. CU is not currency.",
+  "mode": "BALANCED",
+  "resources": {
+    "capturedAt": "2026-09-21T01:45:17.373Z",
+    "cpus": 32,
+    "freeMemMb": 43408,
+    "totalMemMb": 62852,
+    "loadAvg1m": 0,
+    "platform": "win32",
+    "nodeVersion": "v24.16.0",
+    "recommendedConcurrency": 4
+  },
+  "governor": {
+    "mode": "BALANCED",
+    "maxConcurrency": 4,
+    "maxCu": 500,
+    "maxWallMs": 900000,
+    "description": "Default — modest parallelism within measured host capacity."
+  },
+  "optimization": {
+    "depth": 4,
+    "budgetCu": 500,
+    "selected": [
+      "required_parity",
+      "extended_parity",
+      "compat_matrix",
+      "historical_regression",
+      "differential_fuzz",
+      "research_swarm"
+    ],
+    "deferred": [],
+    "estimatedCu": 273,
+    "jobs": [
+      {
+        "id": "required_parity:local:http-get-root",
+        "kind": "execute_local",
+        "name": "Local http-get-root",
+        "priority": 0,
+        "estimatedCu": 1,
+        "dependsOn": [],
+        "meta": {
+          "testId": "http-get-root",
+          "package": "required_parity"
+        }
+      },
+      {
+        "id": "required_parity:local:http-get-health",
+        "kind": "execute_local",
+        "name": "Local http-get-health",
+        "priority": 0,
+        "estimatedCu": 1,
+        "dependsOn": [],
+        "meta": {
+          "testId": "http-get-health",
+          "package": "required_parity"
+        }
+      },
+      {
+        "id": "extended_parity:local:http-get-json",
+        "kind": "execute_local",
+        "name": "Local http-get-json",
+        "priority": 1,
+        "estimatedCu": 1,
+        "dependsOn": [],
+        "meta": {
+          "testId": "http-get-json",
+          "package": "extended_parity"
+        }
+      },
+      {
+        "id": "extended_parity:local:http-post-echo",
+        "kind": "execute_local",
+        "name": "Local http-post-echo",
+        "priority": 1,
+        "estimatedCu": 1,
+        "dependsOn": [],
+        "meta": {
+          "testId": "http-post-echo",
+          "package": "extended_parity"
+        }
+      },
+      {
+        "id": "extended_parity:local:http-not-found",
+        "kind": "execute_local",
+        "name": "Local http-not-found",
+        "priority": 1,
+        "estimatedCu": 1,
+        "dependsOn": [],
+        "meta": {
+          "testId": "http-not-found",
+          "package": "extended_parity"
+        }
+      },
+      {
+        "id": "compat:2024-11-11:http-get-root",
+        "kind": "compat_cell",
+        "name": "Compat 2024-11-11 http-get-root",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2024-11-11",
+          "testId": "http-get-root",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "compat:2024-11-11:http-get-health",
+        "kind": "compat_cell",
+        "name": "Compat 2024-11-11 http-get-health",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2024-11-11",
+          "testId": "http-get-health",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "compat:2025-04-01:http-get-root",
+        "kind": "compat_cell",
+        "name": "Compat 2025-04-01 http-get-root",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2025-04-01",
+          "testId": "http-get-root",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "compat:2025-04-01:http-get-health",
+        "kind": "compat_cell",
+        "name": "Compat 2025-04-01 http-get-health",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2025-04-01",
+          "testId": "http-get-health",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "compat:2025-09-01:http-get-root",
+        "kind": "compat_cell",
+        "name": "Compat 2025-09-01 http-get-root",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2025-09-01",
+          "testId": "http-get-root",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "compat:2025-09-01:http-get-health",
+        "kind": "compat_cell",
+        "name": "Compat 2025-09-01 http-get-health",
+        "priority": 2,
+        "estimatedCu": 8,
+        "dependsOn": [],
+        "meta": {
+          "compatibilityDate": "2025-09-01",
+          "testId": "http-get-health",
+          "package": "compat_matrix"
+        }
+      },
+      {
+        "id": "historical:corpus-replay",
+        "kind": "custom",
+        "name": "Historical corpus replay",
+        "priority": 3,
+        "estimatedCu": 40,
+        "dependsOn": [],
+        "meta": {
+          "package": "historical_regression"
+        }
+      },
+      {
+        "id": "fuzz:differential-hunt",
+        "kind": "custom",
+        "name": "Differential fuzz campaign",
+        "priority": 4,
+        "estimatedCu": 80,
+        "dependsOn": [],
+        "meta": {
+          "package": "differential_fuzz"
+        }
+      },
+      {
+        "id": "research:swarm",
+        "kind": "custom",
+        "name": "Post-gate research swarm",
+        "priority": 4,
+        "estimatedCu": 100,
+        "dependsOn": [],
+        "meta": {
+          "package": "research_swarm"
+        }
+      }
+    ],
+    "rationale": [
+      "Budget 500 CU (accounting only — not currency).",
+      "Selected required_parity (essential, cost 2 CU, density 4.800).",
+      "Selected extended_parity (cost 3 CU, density 2.367, depth 2).",
+      "Selected compat_matrix (cost 16 CU, density 0.488, depth 2).",
+      "Selected historical_regression (cost 40 CU, density 0.153, depth 3).",
+      "Selected differential_fuzz (cost 80 CU, density 0.049, depth 4).",
+      "Selected research_swarm (cost 100 CU, density 0.029, depth 4).",
+      "Achieved verification depth 4. Estimated job CU 273."
+    ],
+    "budgetInsufficientForEssential": false,
+    "valueDensity": [
+      {
+        "id": "required_parity",
+        "density": 4.8,
+        "cost": 2
+      },
+      {
+        "id": "extended_parity",
+        "density": 2.3666666666666667,
+        "cost": 3
+      },
+      {
+        "id": "compat_matrix",
+        "density": 0.48750000000000004,
+        "cost": 16
+      },
+      {
+        "id": "historical_regression",
+        "density": 0.15250000000000002,
+        "cost": 40
+      },
+      {
+        "id": "differential_fuzz",
+        "density": 0.04875,
+        "cost": 80
+      },
+      {
+        "id": "research_swarm",
+        "density": 0.028999999999999998,
+        "cost": 100
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "id": "required_parity:local:http-get-root",
+      "kind": "execute_local",
+      "priority": 0,
+      "estimatedCu": 1
+    },
+    {
+      "id": "required_parity:local:http-get-health",
+      "kind": "execute_local",
+      "priority": 0,
+      "estimatedCu": 1
+    },
+    {
+      "id": "extended_parity:local:http-get-json",
+      "kind": "execute_local",
+      "priority": 1,
+      "estimatedCu": 1
+    },
+    {
+      "id": "extended_parity:local:http-post-echo",
+      "kind": "execute_local",
+      "priority": 1,
+      "estimatedCu": 1
+    },
+    {
+      "id": "extended_parity:local:http-not-found",
+      "kind": "execute_local",
+      "priority": 1,
+      "estimatedCu": 1
+    },
+    {
+      "id": "compat:2024-11-11:http-get-root",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "compat:2024-11-11:http-get-health",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "compat:2025-04-01:http-get-root",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "compat:2025-04-01:http-get-health",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "compat:2025-09-01:http-get-root",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "compat:2025-09-01:http-get-health",
+      "kind": "compat_cell",
+      "priority": 2,
+      "estimatedCu": 8
+    },
+    {
+      "id": "historical:corpus-replay",
+      "kind": "custom",
+      "priority": 3,
+      "estimatedCu": 40
+    },
+    {
+      "id": "fuzz:differential-hunt",
+      "kind": "custom",
+      "priority": 4,
+      "estimatedCu": 80
+    },
+    {
+      "id": "research:swarm",
+      "kind": "custom",
+      "priority": 4,
+      "estimatedCu": 100
+    }
+  ],
+  "totals": {
+    "jobs": 14,
+    "estimatedCu": 273,
+    "estimatedParallelWaves": 5,
+    "estimatedWallMsLow": 250,
+    "estimatedWallMsHigh": 6365,
+    "depth": 4,
+    "selectedPackages": [
+      "required_parity",
+      "extended_parity",
+      "compat_matrix",
+      "historical_regression",
+      "differential_fuzz",
+      "research_swarm"
+    ],
+    "deferredPackages": []
+  },
+  "governors": [
+    {
+      "mode": "ECO",
+      "maxConcurrency": 1,
+      "maxCu": 50,
+      "maxWallMs": 300000,
+      "description": "Serial execution, low CU budget — minimize host load."
+    },
+    {
+      "mode": "BALANCED",
+      "maxConcurrency": 4,
+      "maxCu": 200,
+      "maxWallMs": 900000,
+      "description": "Default — modest parallelism within measured host capacity."
+    },
+    {
+      "mode": "FAST",
+      "maxConcurrency": 8,
+      "maxCu": 500,
+      "maxWallMs": 1800000,
+      "description": "Higher concurrency for large local matrices; still capped by overrides."
+    },
+    {
+      "mode": "MAX",
+      "maxConcurrency": 16,
+      "maxCu": 2000,
+      "maxWallMs": 3600000,
+      "description": "Highest local default — still respects explicit overrides (may exceed)."
+    }
+  ]
+}

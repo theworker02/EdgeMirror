@@ -10,6 +10,7 @@ Markdown hierarchy for the future docs site (`apps/docs` may render these pages 
 | Concepts | [concepts/](./concepts/) |
 | Cloudflare | [cloudflare/](./cloudflare/) |
 | Supercharger | [supercharger.md](./supercharger.md) |
+| Benchmarks | [../BENCHMARKS.md](../BENCHMARKS.md) |
 | CI/CD | [ci-cd.md](./ci-cd.md) |
 | Cloud | [cloud.md](./cloud.md) |
 | Security | [security.md](./security.md) |
