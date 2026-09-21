@@ -74,10 +74,21 @@ This brief does **not** claim Cloudflare endorsement, captive usage metrics, or 
 
 For acquisition or partnership conversations, open a private channel via the GitHub account above and reference this document (`ACQUISITION.md`). Prefer written diligence over verbal-only claims.
 
+**Outbound Cloudflare contact (public channels only):** see [`pitch/cloudflare/OUTREACH.md`](./pitch/cloudflare/OUTREACH.md) — partner form URL, published `partners@cloudflare.com` text, and outreach log. No private employee scraping; one professional message per channel.
+
+### Outreach log (summary)
+
+| Date (UTC) | Channel | Note |
+|------------|---------|------|
+| 2026-09-21 | `partners@cloudflare.com` | Diligence / partnership or acquisition interest (full text in OUTREACH.md) |
+| 2026-09-21 | Partner Network signup | Form documented; may require company-domain email |
+
 ## Trademark / affiliation
 
 “Cloudflare” and “Workers” are trademarks of Cloudflare, Inc. EdgeMirror uses them only to describe compatibility targets. No logo misuse, no “official Cloudflare product” wording.
 
 ## License / commercial IP
 
-EdgeMirror is **source-available proprietary** software (not Apache-2.0 / not OSI open source). Public source supports diligence and evaluation; production, redistribution, SaaS, and other commercial use require a paid commercial license ([`COMMERCIAL.md`](./COMMERCIAL.md)). Acquisition or partnership can include assignment or exclusive licensing of that commercial IP under negotiated terms — see [`LICENSE`](./LICENSE), [`NOTICE`](./NOTICE), and [`LICENSE_TRANSITION_NOTICE.md`](./LICENSE_TRANSITION_NOTICE.md) (enforcement rights for post-transition code may pass to an acquirer/successor; historical Apache-2.0 grants for prior copies are not claimed revoked).
+EdgeMirror is **source-available proprietary** software (not Apache-2.0 / not OSI open source). Public source supports diligence and evaluation; production, redistribution, SaaS, and other commercial use require a paid commercial license ([`COMMERCIAL.md`](./COMMERCIAL.md)).
+
+Acquisition or partnership can include assignment or exclusive licensing of that commercial IP under negotiated terms — see [`LICENSE`](./LICENSE), [`NOTICE`](./NOTICE), and [`LICENSE_TRANSITION_NOTICE.md`](./LICENSE_TRANSITION_NOTICE.md). **If the project is acquired**, the copyright holder and/or the acquirer may take **legal action** against anyone still using **post-transition** EdgeMirror in production or commercially without authorization (without a commercial license under the proprietary terms). Historical Apache-2.0 grants for prior tagged/released copies are **not** claimed revoked.

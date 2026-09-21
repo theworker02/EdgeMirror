@@ -29,13 +29,15 @@ Optional: open a GitHub Discussion or Issue titled `Commercial license inquiry` 
 
 For Cloudflare or other strategic acquisition / partnership conversations, also see [`ACQUISITION.md`](./ACQUISITION.md). Commercial licensing and IP transfer can proceed under negotiated agreements even while the public repository remains source-available for diligence.
 
+**Acquisition enforcement:** If EdgeMirror is acquired, the copyright holder and/or the acquirer may take **legal action** against anyone still using **post-transition** code in production or commercially **without a paid commercial license** under the proprietary terms. Historical Apache-2.0 copies are a separate accuracy matter — see the transition notice.
+
 ## License transition & enforcement
 
 Read [`LICENSE_TRANSITION_NOTICE.md`](./LICENSE_TRANSITION_NOTICE.md) for the diligence-ready letter on:
 
 - historical Apache-2.0 copies (those grants are not claimed revoked);
-- current/future proprietary terms;
-- enforcement of unauthorized commercial use of **post-transition** code by the copyright holder and/or any acquirer/successor.
+- current/future proprietary terms (sale/commercial license required for production & commercial use);
+- enforcement — including potential legal action — of unauthorized commercial or production use of **post-transition** code by the copyright holder and/or any acquirer/successor.
 
 ## Contact
 

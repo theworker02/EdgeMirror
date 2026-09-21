@@ -8,7 +8,7 @@
 #         working-directory: .
 #         local-only: true
 #
-# Independent open-source — not affiliated with Cloudflare, Inc.
+# Independent proprietary (source-available) — not affiliated with Cloudflare, Inc.
 # Fails on divergence (exit 1), config failure (2), or insufficient evidence (3).
 
 name: EdgeMirror Verify (reusable)

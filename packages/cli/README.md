@@ -6,7 +6,7 @@ npx edgemirror verify
 
 Production-parity testing for Cloudflare Workers.
 
-This package is the **unscoped** public CLI (`edgemirror`). It is independent open-source software and is **not** affiliated with or endorsed by Cloudflare.
+This package is the **unscoped** public CLI (`edgemirror`). It is independent **source-available proprietary** software (not open source; commercial/production use requires a paid license — see `COMMERCIAL.md`) and is **not** affiliated with or endorsed by Cloudflare.
 
 ## Install
 

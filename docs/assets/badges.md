@@ -5,7 +5,7 @@ Use only factual badges. Do **not** invent Cloudflare certification or endorseme
 ## Recommended (Agent 4 may paste into README)
 
 ```markdown
-[![License](https://img.shields.io/badge/license-Apache%202.0-0e1419?style=flat-square)](./LICENSE)
+[![License](https://img.shields.io/badge/license-Proprietary%20(source--available)-0e1419?style=flat-square)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-1a7a6d?style=flat-square)](./package.json)
 [![npm](https://img.shields.io/npm/v/edgemirror?style=flat-square&label=edgemirror)](https://www.npmjs.com/package/edgemirror)
 ```

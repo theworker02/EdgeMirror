@@ -42,10 +42,15 @@ redistribution, SaaS, or other commercial rights.
 4. Commercial licenses
 
    Production use, redistribution, SaaS, and other commercial use require
-   a paid commercial license. See COMMERCIAL.md or contact Licensor via
-   GitHub @theworker02. This document is not legal advice and does not
+   a paid commercial license (sale). See COMMERCIAL.md or contact Licensor
+   via GitHub @theworker02. This document is not legal advice and does not
    create a purchase obligation; commercial terms are set in a separate
    written agreement.
+
+   If the Software is acquired, Licensor and/or any acquirer or successor
+   may enforce these terms, including by legal action, against unauthorized
+   production or commercial use of post-transition builds and current
+   repository contents. See LICENSE_TRANSITION_NOTICE.md.
 
 5. Contributions
 

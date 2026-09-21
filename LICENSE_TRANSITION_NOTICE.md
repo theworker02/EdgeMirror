@@ -22,12 +22,14 @@ EdgeMirror previously used Apache-2.0 for public distribution. The project has t
 
 ## Enforcement (post-transition code)
 
-Unauthorized **production**, **redistribution**, **SaaS/hosted**, or other **commercial** use of **post-transition** EdgeMirror code (code distributed under the proprietary [`LICENSE`](./LICENSE), not under a separate commercial agreement) may be enforced by:
+Unauthorized **production**, **redistribution**, **SaaS/hosted**, or other **commercial** use of **post-transition** EdgeMirror code (code distributed under the proprietary [`LICENSE`](./LICENSE), including current `main` and new releases, and not covered by a separate paid commercial agreement) may be enforced by:
 
 1. the current copyright holder (**theworker02**), and/or  
 2. any **acquirer, assignee, or other successor** that obtains copyright or exclusive licensing rights in EdgeMirror.
 
-Enforcement may include (without limitation) requiring a commercial license, seeking injunctive relief, or other remedies available under applicable law. Specific remedies depend on facts, jurisdiction, and the terms of any commercial or acquisition agreement.
+**If the project is acquired**, the copyright holder and/or the acquirer **may take legal action** against anyone still using post-transition EdgeMirror in production or for commercial purposes **without authorization** (that is, without a commercial license under the then-applicable proprietary terms). Continued evaluation-only use under [`LICENSE`](./LICENSE) is not a substitute for a paid commercial license.
+
+Enforcement may include (without limitation) requiring a commercial license, cease-and-desist demands, seeking injunctive relief, damages, or other remedies available under applicable law. Specific remedies depend on facts, jurisdiction, and the terms of any commercial or acquisition agreement.
 
 ## Historical Apache-2.0 copies (accuracy)
 

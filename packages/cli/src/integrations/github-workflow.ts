@@ -2,7 +2,7 @@
 
 /** Baseline PR verify workflow (local-only by default). */
 export const GITHUB_WORKFLOW_YAML = `# EdgeMirror PR verification — run before wrangler deploy
-# Independent open-source — not affiliated with Cloudflare, Inc.
+# Independent proprietary (source-available) — not affiliated with Cloudflare, Inc.
 # Exit codes: 0 parity · 1 divergence · 2 config · 3 insufficient evidence
 name: EdgeMirror Verify
 
@@ -60,7 +60,7 @@ jobs:
  */
 export const CLOUDFLARE_GATE_WORKFLOW_YAML = `# EdgeMirror Cloudflare quality gate
 # Required check before \`wrangler deploy\` / \`edgemirror deploy\`.
-# Independent open-source — not affiliated with Cloudflare, Inc.
+# Independent proprietary (source-available) — not affiliated with Cloudflare, Inc.
 #
 # Why this exists: Workers local tooling (wrangler / workerd) is excellent and
 # still not identical to production. This gate fails CI on divergence or

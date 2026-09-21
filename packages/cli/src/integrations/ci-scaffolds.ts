@@ -7,7 +7,7 @@ export {
 } from "./github-workflow.js";
 
 export const GITLAB_CI_YAML = `# EdgeMirror verify (GitLab CI)
-# Independent open-source — not affiliated with Cloudflare, Inc.
+# Independent proprietary (source-available) — not affiliated with Cloudflare, Inc.
 # Remote/preview require CI variables — omit rather than fabricate results.
 # Fail the pipeline on divergence / insufficient evidence before deploy.
 
