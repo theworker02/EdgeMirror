@@ -16,10 +16,16 @@
 
 **Not found:** A public Cloudflare corporate-development / M&A intake email. Acquisition interest is therefore routed via **partnerships** with an explicit ask to forward to corpdev / product partnerships.
 
-## Email (sent or ready-to-send)
+## Email (SENT)
 
+**Status:** SENT once (do not re-send)  
+**Date (UTC):** 2026-09-21  
+**From:** matthewlooney5@gmail.com  
 **To:** partners@cloudflare.com  
-**Subject:** EdgeMirror — Workers local↔prod evidence layer (diligence / partnership or acquisition interest)
+**Subject:** EdgeMirror — Workers local↔prod evidence layer (diligence / partnership or acquisition interest)  
+**Message id:** `1a0c1c1553ed1922`  
+**Thread id:** `1a0c1a1a6d4b6aac`  
+**Draft:** `r1003802148455645687` consumed / gone after send
 
 ```
 Hello Cloudflare Partnerships team,
@@ -63,7 +69,7 @@ https://github.com/theworker02
 
 | Date (UTC) | Channel | Action | Result |
 |------------|---------|--------|--------|
-| 2026-09-21 | Gmail draft → `partners@cloudflare.com` | Ready-to-send diligence / partnership+acquisition interest email created in authenticated Gmail | **Draft only** — user must review and Send |
+| 2026-09-21 | Gmail → `partners@cloudflare.com` | Sent once from `matthewlooney5@gmail.com` — subject EdgeMirror diligence / partnership+acquisition interest; msg `1a0c1c1553ed1922`, thread `1a0c1a1a6d4b6aac`; draft `r1003802148455645687` consumed | **SENT** — do not re-send |
 | 2026-09-21 | Partner Network signup form | Documented at https://www.partners.cloudflare.com/partners/s/signup | **Manual** — portal often requires company-domain email |
 
-**User next steps:** (1) Open Gmail Drafts, review the EdgeMirror message to `partners@cloudflare.com`, send once. (2) Optionally submit the Partner Network form with the same short pitch if you have a company email. Do not re-send to other Cloudflare addresses unless they reply with a better inbox.
+**User next steps:** (1) Wait for reply on the sent thread; do not re-send to `partners@cloudflare.com` or other Cloudflare addresses unless they reply with a better inbox. (2) Optionally submit the Partner Network form with the same short pitch if you have a company email.

@@ -80,7 +80,7 @@ For acquisition or partnership conversations, open a private channel via the Git
 
 | Date (UTC) | Channel | Note |
 |------------|---------|------|
-| 2026-09-21 | Gmail draft → `partners@cloudflare.com` | Ready to send — review in Gmail Drafts (full text in OUTREACH.md) |
+| 2026-09-21 | Gmail → `partners@cloudflare.com` | **SENT** once — msg `1a0c1c1553ed1922`, thread `1a0c1a1a6d4b6aac` (details in OUTREACH.md); do not re-send |
 | 2026-09-21 | Partner Network signup | Form documented; may require company-domain email |
 
 ## Trademark / affiliation
