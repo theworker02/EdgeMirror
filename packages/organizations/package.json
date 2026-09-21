@@ -1,6 +1,6 @@
 {
   "name": "@edgemirror/organizations",
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "EdgeMirror orgs — membership, seats, Stripe customer linkage",
   "type": "module",
   "main": "./dist/index.js",

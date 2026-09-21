@@ -19,13 +19,32 @@ node packages/cli/dist/cli/bin.js supercharge plan --cu 500
 
 # Synthetic scheduler microbench (MEASURED wall times)
 node packages/cli/dist/cli/bin.js supercharge bench --jobs 24 --sleep-ms 15 --mode FAST --json
+node packages/cli/dist/cli/bin.js supercharge bench --jobs 500 --sleep-ms 8 --mode MAX --scheduler classic --json
+node packages/cli/dist/cli/bin.js supercharge bench --jobs 500 --sleep-ms 8 --mode MAX --scheduler double-trouble --json
 ```
 
 Methodology notes also live in [`benchmarks/README.md`](../benchmarks/README.md). Performance gates: [`.agent/performance-gates.md`](../.agent/performance-gates.md).
 
 ---
 
-## MEASURED — synthetic microbench
+## MEASURED — 500-job capacity (classic vs Double Trouble)
+
+**Host class:** same harness family as below (win32 · Node v24 · multi-core).  
+**Workload:** 500 jobs × 8 ms sleep · governor mode `MAX` · maxConcurrency 128  
+**Disclaimer:** Synthetic I/O-bound jobs only. Not a claim about wrangler/parity verify speedups. **CU is accounting only — not cryptocurrency.**
+
+| Scheduler | Sequential wall | Supercharger wall | Wall ratio | Concurrency | Pair waves | Gates | Artifact |
+|-----------|-----------------|-------------------|------------|-------------|------------|-------|----------|
+| **classic** | **7783 ms** | **63 ms** | **123.543×** | 128 | — | **PASS** | [`benchmarks/microbench-500-classic-1789957641937.json`](../benchmarks/microbench-500-classic-1789957641937.json) |
+| **double-trouble** | **7791 ms** | **62 ms** | **125.658×** | 128 | **250** | **PASS** | [`benchmarks/microbench-500-double-trouble-1789957649891.json`](../benchmarks/microbench-500-double-trouble-1789957649891.json) |
+
+**What this proves:** Both schedulers complete a **≥500-job** synthetic DAG under `MAX` with hard performance gates green. Double Trouble records pair-wave accounting (`pairWaves=250` for 500 jobs).
+
+**What this does not prove:** End-to-end `edgemirror verify` wall time against real Workers fixtures.
+
+---
+
+## MEASURED — synthetic microbench (24-job FAST)
 
 **Captured:** 2026-09-21T01:43:31.167Z  
 **Host:** win32 · Node v24.16.0 · 32 CPUs · ~62 GB RAM (from `supercharge doctor`)  

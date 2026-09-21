@@ -7,6 +7,9 @@
 
 import type { GovernorLimits, GovernorMode } from "./types.js";
 
+/** Soft scheduler capacity — plans/microbenches may schedule up to this many jobs. */
+export const MAX_SCHEDULE_JOBS = 10_000;
+
 const GOVERNORS: Record<GovernorMode, Omit<GovernorLimits, "mode">> = {
   ECO: {
     maxConcurrency: 1,
@@ -15,22 +18,23 @@ const GOVERNORS: Record<GovernorMode, Omit<GovernorLimits, "mode">> = {
     description: "Serial execution, low CU budget — minimize host load.",
   },
   BALANCED: {
-    maxConcurrency: 4,
-    maxCu: 200,
+    maxConcurrency: 8,
+    maxCu: 500,
     maxWallMs: 15 * 60_000,
     description: "Default — modest parallelism within measured host capacity.",
   },
   FAST: {
-    maxConcurrency: 8,
-    maxCu: 500,
+    maxConcurrency: 32,
+    maxCu: 2_000,
     maxWallMs: 30 * 60_000,
     description: "Higher concurrency for large local matrices; still capped by overrides.",
   },
   MAX: {
-    maxConcurrency: 16,
-    maxCu: 2_000,
+    maxConcurrency: 128,
+    maxCu: 10_000,
     maxWallMs: 60 * 60_000,
-    description: "Highest local default — still respects explicit overrides (may exceed).",
+    description:
+      "Highest local default — aggressive fan-out for I/O-bound DAGs (may exceed via overrides).",
   },
 };
 

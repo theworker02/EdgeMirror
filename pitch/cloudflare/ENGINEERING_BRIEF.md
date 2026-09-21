@@ -45,9 +45,11 @@ Built-in HTTP corpus plus project corpus paths (e.g. bindings fixture). DEMO / p
 
 ## Supercharger
 
-Optional CU budget optimizer — selects different work packages by budget density. **Compute Units are accounting meters — not cryptocurrency.** CLI verify works without Supercharger.
+Optional CU budget optimizer + DAG schedulers — selects different work packages by budget density. **Compute Units are accounting meters — not cryptocurrency.** CLI verify works without Supercharger.
 
-Shipped CLI: `edgemirror supercharge plan|bench|doctor`, `verify --supercharge`. Measured synthetic microbench + CU plan differentiation: [`docs/BENCHMARKS.md`](../../docs/BENCHMARKS.md).
+Schedulers: `classic` (default adaptive) | **`double-trouble`** (pair-wise / dyadic). CLI: `edgemirror supercharge plan|bench|doctor`, `verify --supercharge [--scheduler classic|double-trouble]`.
+
+Measured synthetic microbench (including **500-job** classic + Double Trouble) + CU plan differentiation: [`docs/BENCHMARKS.md`](../../docs/BENCHMARKS.md) · [`docs/SUPERCHARGER.md`](../../docs/SUPERCHARGER.md).
 
 ## Security
 
@@ -69,8 +71,24 @@ Do not cite fabricated divergences. Use `edgemirror pitch-demo` for labeled demo
 - Vitest pool correlation via `@edgemirror/vitest` reporter (does not replace CF pool)
 - Potential first-party packaging under Cloudflare developer tooling (subject to acquisition / partnership)
 
+## Diligence packet (executive + engineering)
+
+**v1.4.0 freeze note:** Product + docs cut for diligence; parent bumps versions/tags. Prefer this packet over verbal-only claims.
+
+1. [`EXECUTIVE_SUMMARY.md`](./EXECUTIVE_SUMMARY.md) — board-room one page
+2. [`ONE_PAGER.md`](./ONE_PAGER.md) — scannable bullets + link list
+3. [`WHY_NOW.md`](./WHY_NOW.md) — timing / trust-gap thesis
+4. [`COMPETITIVE_LANDSCAPE.md`](./COMPETITIVE_LANDSCAPE.md) — honest niche (no fake teardown)
+5. [`DEMO_SCRIPT.md`](./DEMO_SCRIPT.md) — 5-minute live path
+6. This brief — engineering surface
+7. [`ACQUISITION.md`](../../ACQUISITION.md) — acquisition / partnership brief
+8. [`docs/ACQUISITION_READINESS.md`](../../docs/ACQUISITION_READINESS.md)
+9. [`docs/BENCHMARKS.md`](../../docs/BENCHMARKS.md) · [`docs/SUPERCHARGER.md`](../../docs/SUPERCHARGER.md)
+
 ## Links
 
 - Live demo: https://theworker02.github.io/EdgeMirror/
 - Acquisition brief: [`ACQUISITION.md`](../../ACQUISITION.md)
+- Executive summary: [`EXECUTIVE_SUMMARY.md`](./EXECUTIVE_SUMMARY.md)
 - Diligence: [`docs/ACQUISITION_READINESS.md`](../../docs/ACQUISITION_READINESS.md)
+- Outreach log: [`OUTREACH.md`](./OUTREACH.md)

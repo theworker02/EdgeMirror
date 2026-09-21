@@ -8,6 +8,28 @@
 
 export type GovernorMode = "ECO" | "BALANCED" | "FAST" | "MAX";
 
+/**
+ * Scheduler algorithm selection (either/or).
+ * - `classic` — default adaptive fan-out (fill all free concurrency slots)
+ * - `double-trouble` — dyadic / pair-wise: launch ready work in groups of two
+ */
+export type SchedulerKind = "classic" | "double-trouble";
+
+export const SCHEDULER_KINDS: SchedulerKind[] = ["classic", "double-trouble"];
+
+export function parseSchedulerKind(raw?: string): SchedulerKind {
+  const v = (raw ?? "classic").trim().toLowerCase().replace(/_/g, "-");
+  if (v === "double-trouble" || v === "doubletrouble" || v === "dt" || v === "pairs") {
+    return "double-trouble";
+  }
+  if (v === "classic" || v === "default" || v === "supercharge" || v === "standard") {
+    return "classic";
+  }
+  throw new Error(
+    `Unknown scheduler "${raw}". Use classic|double-trouble (aliases: default, dt, pairs).`,
+  );
+}
+
 /** Priority bands — lower number = higher priority (time-to-confidence). */
 export type JobPriority = 0 | 1 | 2 | 3 | 4;
 
@@ -96,6 +118,11 @@ export interface CuBudget {
 export interface SuperchargeOptions {
   enabled: boolean;
   mode?: GovernorMode;
+  /**
+   * Scheduler algorithm: `classic` (default adaptive) or `double-trouble`
+   * (pair-wise / dyadic launching). Either/or — not combined.
+   */
+  scheduler?: SchedulerKind;
   /** Explicit concurrency ceiling (overrides governor max if lower) */
   maxConcurrency?: number;
   /** Explicit CU ceiling */
@@ -118,4 +145,10 @@ export interface ScheduleResult {
   wallMs: number;
   cacheHits: number;
   cancelledRemaining: boolean;
+  /** Which scheduler algorithm ran */
+  scheduler: SchedulerKind;
+  /** Double Trouble: number of pair launch waves (classic = 0) */
+  pairWaves: number;
+  /** Double Trouble: singleton tail starts (odd leftover) */
+  singletonTails: number;
 }

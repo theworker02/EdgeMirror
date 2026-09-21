@@ -2,6 +2,7 @@ import type { Command } from "commander";
 import { runVerify } from "../../verify/index.js";
 import type { ReportFormat } from "../../reporter/index.js";
 import type { GovernorMode } from "../../supercharger/types.js";
+import { parseSchedulerKind } from "../../supercharger/types.js";
 
 export function registerVerifyCommand(program: Command): void {
   const action = async (opts: {
@@ -19,6 +20,7 @@ export function registerVerifyCommand(program: Command): void {
     nightly?: boolean;
     mode?: string;
     cu?: string;
+    scheduler?: string;
   }) => {
     let selection: "full" | "fast" | "incremental" | "nightly" | undefined;
     if (opts.nightly) selection = "nightly";
@@ -32,6 +34,10 @@ export function registerVerifyCommand(program: Command): void {
         : opts.cu
           ? Number(opts.cu)
           : undefined;
+
+    const scheduler = opts.scheduler
+      ? parseSchedulerKind(opts.scheduler)
+      : undefined;
 
     const result = await runVerify({
       format: (opts.format ?? "terminal") as ReportFormat,
@@ -50,6 +56,7 @@ export function registerVerifyCommand(program: Command): void {
             timeToConfidence: true,
             cache: true,
             maxCu: Number.isFinite(cuFromFlag) ? cuFromFlag : undefined,
+            scheduler: scheduler ?? "classic",
           }
         : selection
           ? {
@@ -83,6 +90,11 @@ export function registerVerifyCommand(program: Command): void {
     .option("--full", "Full corpus selection")
     .option("--nightly", "Nightly selection (currently full; labeled honestly)")
     .option("--mode <mode>", "Supercharger governor ECO|BALANCED|FAST|MAX", "BALANCED")
+    .option(
+      "--scheduler <kind>",
+      "Supercharger scheduler: classic|double-trouble",
+      "classic",
+    )
     .option("-q, --quiet", "Suppress stdout report")
     .action(action);
 }

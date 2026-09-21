@@ -18,6 +18,11 @@ import {
 import { registerCloudCommand } from "./commands/cloud.js";
 import { registerSuperchargeCommand } from "./commands/supercharge.js";
 import { registerRunnerCommand } from "./commands/runner.js";
+import { registerBadgeCommand } from "./commands/badge.js";
+import {
+  registerReproduceCommand,
+  registerEmfCommand,
+} from "./commands/reproduce.js";
 import { runDefaultAction } from "./onboarding.js";
 import { formatError } from "./ux.js";
 
@@ -59,7 +64,11 @@ ${pc.bold("Examples")}
   edgemirror matrix --dates 2025-04-01
   edgemirror supercharge doctor
   edgemirror supercharge plan
-  edgemirror supercharge bench
+  edgemirror supercharge bench --scheduler classic|double-trouble
+  edgemirror verify --supercharge --scheduler double-trouble
+  edgemirror badge
+  edgemirror reproduce EM-001
+  edgemirror emf EM-001
   edgemirror runner start
   edgemirror bundle EM-001
 
@@ -80,6 +89,9 @@ registerDemoCommand(program);
 registerPitchDemoCommand(program);
 registerCloudCommand(program);
 registerSuperchargeCommand(program);
+registerBadgeCommand(program);
+registerReproduceCommand(program);
+registerEmfCommand(program);
 registerRunnerCommand(program);
 
 async function main(): Promise<void> {
@@ -101,6 +113,9 @@ async function main(): Promise<void> {
     "pitch-demo",
     "cloud",
     "supercharge",
+    "badge",
+    "reproduce",
+    "emf",
     "runner",
     "help",
   ]);

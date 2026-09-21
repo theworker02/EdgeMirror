@@ -13,6 +13,7 @@ import {
   evaluatePerfGates,
   parallelMinimize,
   listGovernors,
+  parseSchedulerKind,
   type GovernorMode,
 } from "../../supercharger/index.js";
 
@@ -96,15 +97,32 @@ export function registerSuperchargeCommand(program: Command): void {
   cmd
     .command("bench")
     .description("Run reproducible synthetic microbench (measured only)")
-    .option("--jobs <n>", "Job count", "24")
-    .option("--sleep-ms <n>", "Per-job sleep", "15")
-    .option("--mode <mode>", "ECO|BALANCED|FAST|MAX", "FAST")
+    .option("--jobs <n>", "Job count", "500")
+    .option("--sleep-ms <n>", "Per-job sleep", "8")
+    .option("--mode <mode>", "ECO|BALANCED|FAST|MAX", "MAX")
+    .option(
+      "--scheduler <kind>",
+      "classic|double-trouble (pair-wise dyadic scheduler)",
+      "classic",
+    )
+    .option("--concurrency <n>", "Explicit concurrency ceiling (optional)")
     .option("--json", "Print JSON")
-    .action(async (opts: { jobs?: string; sleepMs?: string; mode?: string; json?: boolean }) => {
+    .action(async (opts: {
+      jobs?: string;
+      sleepMs?: string;
+      mode?: string;
+      scheduler?: string;
+      concurrency?: string;
+      json?: boolean;
+    }) => {
+      const conc = opts.concurrency ? Number(opts.concurrency) : undefined;
+      const scheduler = parseSchedulerKind(opts.scheduler);
       const bench = await runMicrobench({
-        jobs: Number(opts.jobs ?? 24),
-        sleepMs: Number(opts.sleepMs ?? 15),
-        mode: (opts.mode ?? "FAST").toUpperCase() as GovernorMode,
+        jobs: Number(opts.jobs ?? 500),
+        sleepMs: Number(opts.sleepMs ?? 8),
+        mode: (opts.mode ?? "MAX").toUpperCase() as GovernorMode,
+        scheduler,
+        maxConcurrency: Number.isFinite(conc) ? conc : undefined,
       });
       const gates = evaluatePerfGates(bench);
       const cwd = process.cwd();
@@ -117,22 +135,40 @@ export function registerSuperchargeCommand(program: Command): void {
       }
       mkdirSync(outDir, { recursive: true });
       const outPath = join(outDir, `microbench-${Date.now()}.json`);
-      writeFileSync(
-        outPath,
-        JSON.stringify({ bench, gates }, null, 2),
-        "utf8",
-      );
+      writeFileSync(outPath, JSON.stringify({ bench, gates }, null, 2), "utf8");
+      try {
+        const repoBench = join(cwd, "benchmarks");
+        mkdirSync(repoBench, { recursive: true });
+        if (outDir !== repoBench) {
+          writeFileSync(
+            join(repoBench, `microbench-${Date.now()}.json`),
+            JSON.stringify({ bench, gates }, null, 2),
+            "utf8",
+          );
+        }
+      } catch {
+        /* ignore mirror failures */
+      }
       if (opts.json) {
         console.log(JSON.stringify({ bench, gates, outPath }, null, 2));
       } else {
         console.log("Supercharger microbench (measured)");
         console.log(bench.disclaimer);
+        console.log(bench.methodology);
+        console.log(
+          `Workload: ${bench.workload.jobs} jobs × ${bench.workload.sleepMs} ms · mode ${bench.workload.mode} · scheduler ${bench.workload.scheduler}`,
+        );
         console.log(
           `Standard sequential:   ${bench.standard.wallMs} ms  (${bench.standard.jobsPerSec} jobs/s)`,
         );
         console.log(
-          `Supercharger schedule: ${bench.supercharger.wallMs} ms  (${bench.supercharger.jobsPerSec} jobs/s)  conc=${bench.supercharger.concurrency}  cu=${bench.supercharger.cuUsed}`,
+          `Supercharger schedule: ${bench.supercharger.wallMs} ms  (${bench.supercharger.jobsPerSec} jobs/s)  conc=${bench.supercharger.concurrency}  cu=${bench.supercharger.cuUsed}  completed=${bench.supercharger.jobsCompleted}`,
         );
+        if (bench.workload.scheduler === "double-trouble") {
+          console.log(
+            `Double Trouble:        pairWaves=${bench.supercharger.pairWaves}  singletonTails=${bench.supercharger.singletonTails}`,
+          );
+        }
         console.log(
           `Measured wall ratio:   ${bench.ratio.wallSpeedupMeasured}× (standard/supercharger)`,
         );
@@ -166,10 +202,11 @@ export function registerSuperchargeCommand(program: Command): void {
     console.log("EdgeMirror Supercharger (optional)");
     console.log("  edgemirror supercharge doctor");
     console.log("  edgemirror supercharge plan");
-    console.log("  edgemirror supercharge bench");
-    console.log("  edgemirror verify --supercharge");
+    console.log("  edgemirror supercharge bench [--scheduler classic|double-trouble]");
+    console.log("  edgemirror verify --supercharge [--scheduler double-trouble]");
     console.log("  edgemirror verify --fast");
     console.log("");
+    console.log("Schedulers: classic (default adaptive) | double-trouble (pair-wise).");
     console.log("CU = resource accounting only — not cryptocurrency.");
     console.log("OSS verify works without Supercharger.");
   });

@@ -43,29 +43,39 @@ This brief does **not** claim Cloudflare endorsement, captive usage metrics, or 
 - Public monorepo + GitHub Pages live demo
 - Publishable CLI package identity: `edgemirror` (distribution gate: `npm run gate:distribution`)
 - `verify` / `preview` / `pitch-demo` / `doctor --bindings` / Supercharger CU planner
+- **Supercharger schedulers:** `classic` | **`double-trouble`** (pair-wise); measured ≥500-job microbench — [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)
 - **Cloudflare quality gate:** `.github/workflows/reusable-edgemirror-verify.yml` + `edgemirror init --cloudflare-gate`
 - **Deploy hardening:** `edgemirror deploy` refuses failed verify unless `--force`
 - **Support escalation:** `edgemirror support-bundle` (alias `escalate`)
 - Ownership-tracked throwaway `edgemirror-tmp-*` Workers with cleanup
 - Security docs, threat model, SBOM scripts, adversarial tests
+- **v1.4.0 frozen diligence cut:** executive packet under `pitch/cloudflare/`; Supercharger classic + Double Trouble; EMF/1 + `badge` / `reproduce` / `emf` CLI; measured 500-job benches
 
 ## What is intentionally separate
 
-- Hosted multi-tenant Cloud / Stripe catalog (code present; catalog requires operator keys)
+- Hosted multi-tenant Cloud / Stripe catalog (code present; catalog requires operator keys) — **not shipped** as a public product
 - npm registry publish (gate proven; publish deferred until external dogfood)
 - Any claim of Cloudflare endorsement
 - Fabricated MAU / revenue / “Cloudflare depends on us” metrics
 
 ## Diligence packet (read in order)
 
+**v1.4.0 freeze note:** Frozen diligence cut for corpdev / partnerships. Prefer this packet over verbal-only claims.
+
 1. This brief — `ACQUISITION.md`
-2. Technical readiness — [`docs/ACQUISITION_READINESS.md`](./docs/ACQUISITION_READINESS.md)
-3. Engineering brief — [`pitch/cloudflare/ENGINEERING_BRIEF.md`](./pitch/cloudflare/ENGINEERING_BRIEF.md)
-4. Cloudflare integration matrix — [`docs/CLOUDFLARE_INTEGRATION.md`](./docs/CLOUDFLARE_INTEGRATION.md)
-5. Architecture — [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
-6. Security / threat model — [`docs/SECURITY.md`](./docs/SECURITY.md), [`docs/THREAT_MODEL.md`](./docs/THREAT_MODEL.md)
-7. Evidence model — [`docs/EVIDENCE_MODEL.md`](./docs/EVIDENCE_MODEL.md)
-8. Live demo — https://theworker02.github.io/EdgeMirror/
+2. Executive summary — [`pitch/cloudflare/EXECUTIVE_SUMMARY.md`](./pitch/cloudflare/EXECUTIVE_SUMMARY.md)
+3. One-pager + link list — [`pitch/cloudflare/ONE_PAGER.md`](./pitch/cloudflare/ONE_PAGER.md)
+4. Why now — [`pitch/cloudflare/WHY_NOW.md`](./pitch/cloudflare/WHY_NOW.md)
+5. Competitive landscape (honest niche) — [`pitch/cloudflare/COMPETITIVE_LANDSCAPE.md`](./pitch/cloudflare/COMPETITIVE_LANDSCAPE.md)
+6. Demo script — [`pitch/cloudflare/DEMO_SCRIPT.md`](./pitch/cloudflare/DEMO_SCRIPT.md)
+7. Technical readiness — [`docs/ACQUISITION_READINESS.md`](./docs/ACQUISITION_READINESS.md)
+8. Engineering brief — [`pitch/cloudflare/ENGINEERING_BRIEF.md`](./pitch/cloudflare/ENGINEERING_BRIEF.md)
+9. Cloudflare integration matrix — [`docs/CLOUDFLARE_INTEGRATION.md`](./docs/CLOUDFLARE_INTEGRATION.md)
+10. Architecture — [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
+11. Security / threat model — [`docs/SECURITY.md`](./docs/SECURITY.md), [`docs/THREAT_MODEL.md`](./docs/THREAT_MODEL.md)
+12. Evidence model / EMF — [`docs/EVIDENCE_MODEL.md`](./docs/EVIDENCE_MODEL.md), [`docs/EMF.md`](./docs/EMF.md)
+13. Supercharger + MEASURED benches — [`docs/SUPERCHARGER.md`](./docs/SUPERCHARGER.md), [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)
+14. Live demo — https://theworker02.github.io/EdgeMirror/ · acquisition page — https://theworker02.github.io/EdgeMirror/acquisition.html
 
 ## Contact
 

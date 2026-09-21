@@ -11,6 +11,7 @@
 import type { JobPriority, JobSpec } from "./types.js";
 import { estimateCu } from "./cu.js";
 import { priorityForTest } from "./dag.js";
+import { MAX_SCHEDULE_JOBS } from "./governors.js";
 
 export type VerificationDepth = 1 | 2 | 3 | 4;
 
@@ -22,6 +23,28 @@ export type WorkPackageId =
   | "differential_fuzz"
   | "research_swarm";
 
+/** Expand a multi-CU package into independent 1-CU schedulable units. */
+function buildUnitJobs(
+  prefix: string,
+  count: number,
+  priority: JobPriority,
+  packageId: WorkPackageId,
+): JobSpec[] {
+  const n = Math.max(0, Math.floor(count));
+  const jobs: JobSpec[] = [];
+  for (let i = 0; i < n; i++) {
+    jobs.push({
+      id: `${prefix}:${i}`,
+      kind: "custom",
+      name: `${prefix} unit ${i}`,
+      priority,
+      estimatedCu: 1,
+      dependsOn: [],
+      meta: { package: packageId, unit: i },
+    });
+  }
+  return jobs;
+}
 export interface WorkPackage {
   id: WorkPackageId;
   /** Human label */
@@ -174,7 +197,10 @@ export const WORK_CATALOG: WorkPackage[] = [
       novelty: 0.4,
     },
     estimateCu: (s) => {
-      const dates = s.compatDates.length || 1;
+      const dates =
+        s.compatDates.length > 0
+          ? s.compatDates.length
+          : 3; // matches default dates in buildJobs
       const tests = Math.min(pickEssential(s.testIds).length, 3);
       return dates * tests * estimateCu("compat_cell");
     },
@@ -187,15 +213,24 @@ export const WORK_CATALOG: WorkPackage[] = [
       const jobs: JobSpec[] = [];
       for (const date of dates) {
         for (const testId of tests) {
-          jobs.push({
-            id: `compat:${date}:${testId}`,
-            kind: "compat_cell",
-            name: `Compat ${date} ${testId}`,
-            priority: 2,
-            estimatedCu: estimateCu("compat_cell"),
-            dependsOn: [],
-            meta: { compatibilityDate: date, testId, package: "compat_matrix" },
-          });
+          // Expand each compat cell into 1-CU units (weight = compat_cell CU).
+          const units = estimateCu("compat_cell");
+          for (let u = 0; u < units; u++) {
+            jobs.push({
+              id: `compat:${date}:${testId}:${u}`,
+              kind: "compat_cell",
+              name: `Compat ${date} ${testId} #${u}`,
+              priority: 2,
+              estimatedCu: 1,
+              dependsOn: [],
+              meta: {
+                compatibilityDate: date,
+                testId,
+                package: "compat_matrix",
+                unit: u,
+              },
+            });
+          }
         }
       }
       return jobs;
@@ -213,17 +248,8 @@ export const WORK_CATALOG: WorkPackage[] = [
       novelty: 0.3,
     },
     estimateCu: () => 40,
-    buildJobs: () => [
-      {
-        id: "historical:corpus-replay",
-        kind: "custom",
-        name: "Historical corpus replay",
-        priority: 3,
-        estimatedCu: 40,
-        dependsOn: [],
-        meta: { package: "historical_regression" },
-      },
-    ],
+    buildJobs: () =>
+      buildUnitJobs("historical", 40, 3, "historical_regression"),
   },
   {
     id: "differential_fuzz",
@@ -237,17 +263,7 @@ export const WORK_CATALOG: WorkPackage[] = [
       novelty: 1,
     },
     estimateCu: () => 80,
-    buildJobs: () => [
-      {
-        id: "fuzz:differential-hunt",
-        kind: "custom",
-        name: "Differential fuzz campaign",
-        priority: 4,
-        estimatedCu: 80,
-        dependsOn: [],
-        meta: { package: "differential_fuzz" },
-      },
-    ],
+    buildJobs: () => buildUnitJobs("fuzz", 80, 4, "differential_fuzz"),
   },
   {
     id: "research_swarm",
@@ -261,17 +277,7 @@ export const WORK_CATALOG: WorkPackage[] = [
       novelty: 0.9,
     },
     estimateCu: () => 100,
-    buildJobs: () => [
-      {
-        id: "research:swarm",
-        kind: "custom",
-        name: "Post-gate research swarm",
-        priority: 4,
-        estimatedCu: 100,
-        dependsOn: [],
-        meta: { package: "research_swarm" },
-      },
-    ],
+    buildJobs: () => buildUnitJobs("research", 100, 4, "research_swarm"),
   },
 ];
 
@@ -364,11 +370,36 @@ export function optimizeForBudget(input: OptimizeInput): OptimizeResult {
     jobs.push(...pkg.buildJobs(scale));
   }
 
-  const estimatedCu = jobs.reduce((s, j) => s + j.estimatedCu, 0);
+  // Spend remaining CU as independent 1-CU fan-out units so high budgets
+  // schedule proportionally more parallel work (capped by MAX_SCHEDULE_JOBS).
+  let estimatedCu = jobs.reduce((s, j) => s + j.estimatedCu, 0);
+  let fanout = 0;
+  while (
+    estimatedCu < input.budgetCu &&
+    jobs.length < MAX_SCHEDULE_JOBS
+  ) {
+    jobs.push({
+      id: `fanout:${fanout}`,
+      kind: "custom",
+      name: `Budget fan-out ${fanout}`,
+      priority: 4,
+      estimatedCu: 1,
+      dependsOn: [],
+      meta: { package: "budget_fanout", unit: fanout },
+    });
+    estimatedCu += 1;
+    fanout += 1;
+  }
+  if (fanout > 0) {
+    rationale.push(
+      `Expanded ${fanout} budget fan-out units (1 CU each) to utilize remaining CU under scheduler cap ${MAX_SCHEDULE_JOBS}.`,
+    );
+  }
+
   const depth = depthFromSelected(selected);
 
   rationale.push(
-    `Achieved verification depth ${depth}. Estimated job CU ${estimatedCu}.`,
+    `Achieved verification depth ${depth}. Scheduled ${jobs.length} jobs · estimated CU ${estimatedCu}.`,
   );
 
   return {

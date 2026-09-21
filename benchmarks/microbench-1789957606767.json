@@ -1,0 +1,69 @@
+{
+  "bench": {
+    "schemaVersion": "1.0",
+    "kind": "supercharger-microbench",
+    "measuredAt": "2026-09-21T02:26:46.766Z",
+    "workload": {
+      "jobs": 500,
+      "sleepMs": 8,
+      "mode": "MAX",
+      "scheduler": "double-trouble",
+      "maxConcurrency": 128
+    },
+    "standard": {
+      "label": "sequential",
+      "wallMs": 7791,
+      "jobsPerSec": 64.18
+    },
+    "supercharger": {
+      "label": "scheduler",
+      "wallMs": 65,
+      "jobsPerSec": 7692.31,
+      "concurrency": 128,
+      "cacheHits": 0,
+      "cuUsed": 500,
+      "jobsCompleted": 500,
+      "scheduler": "double-trouble",
+      "pairWaves": 250,
+      "singletonTails": 0
+    },
+    "ratio": {
+      "wallSpeedupMeasured": 119.861
+    },
+    "methodology": "Sequential baseline awaits 500 independent setTimeout(8ms) jobs one-by-one. Supercharger (double-trouble) schedules the same jobs under governor MAX with maxConcurrency=128. Wall times from performance.now(). I/O-bound synthetic only — not wrangler/workerd verify.",
+    "disclaimer": "Measured synthetic I/O-bound jobs only. Not a claim about wrangler/parity verify speedups. Re-run on your machine. CU is accounting only — not cryptocurrency."
+  },
+  "gates": {
+    "passed": true,
+    "results": [
+      {
+        "id": "microbench-completes",
+        "severity": "hard",
+        "pass": true,
+        "detail": "standard=7791ms supercharger=65ms",
+        "description": "Synthetic microbench finishes and reports measurements"
+      },
+      {
+        "id": "scheduler-not-slower-than-3x",
+        "severity": "hard",
+        "pass": true,
+        "detail": "ratio=0.008 (limit 3.0)",
+        "description": "Scheduler wall time should not be >3× sequential on synthetic I/O (catastrophic regression)"
+      },
+      {
+        "id": "cu-accounting-present",
+        "severity": "hard",
+        "pass": true,
+        "detail": "cuUsed=500",
+        "description": "CU ledger records usage (accounting only)"
+      },
+      {
+        "id": "no-fake-speedup-field",
+        "severity": "hard",
+        "pass": true,
+        "detail": "ratioKeys=wallSpeedupMeasured",
+        "description": "Results must expose measured ratio only (no marketing speedup field)"
+      }
+    ]
+  }
+}

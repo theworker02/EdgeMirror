@@ -1,6 +1,6 @@
 {
   "name": "@edgemirror/billing",
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "EdgeMirror Cloud Stripe billing — plans, entitlements, Checkout, webhooks, CU metering",
   "type": "module",
   "main": "./dist/index.js",

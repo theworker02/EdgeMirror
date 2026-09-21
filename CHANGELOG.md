@@ -2,18 +2,39 @@
 
 All notable changes to EdgeMirror are documented here.
 
-This file is reconstructed from **git history** on `main` / `agent/docs` baseline. Dates and features are not invented.
+Format inspired by [Keep a Changelog](https://keepachangelog.com/).
 
-Format inspired by [Keep a Changelog](https://keepachangelog.com/). Version tags may lag commits until release engineering cuts formal releases.
+## [1.4.0] — 2026-09-21
+
+**Frozen diligence cut** for Cloudflare partnership / acquisition review. Tag `v1.4.0`.
+
+### Added
+
+- **Double Trouble** Supercharger scheduler — pair-wise / dyadic launching (`--scheduler classic|double-trouble`; aliases `dt`, `pairs`)
+- Scheduler capacity for **≥500** independent jobs (microbench default 500; plan fan-out under CU budget)
+- Faster Supercharger hot path: incremental DAG ready queue, batch slot fill, `performance.now()` wall clock, MAX concurrency up to 128
+- `edgemirror badge` — markdown/SVG/JSON badge from **real** local `.edgemirror` artifacts (`UNKNOWN` if none — never fake green)
+- `edgemirror reproduce [EM-###]` — honest reproduce steps from receipts
+- `edgemirror emf EM-###` — export **EMF/1** public finding JSON ([docs/EMF.md](./docs/EMF.md))
+- Cloudflare executive diligence pack under `pitch/cloudflare/` (executive summary, one-pager, why-now, competitive landscape, demo script)
+- Measured 500-job microbenches (classic + Double Trouble) in [docs/BENCHMARKS.md](./docs/BENCHMARKS.md)
+
+### Changed
+
+- Monorepo + publishable packages versioned **1.4.0**
+- Supercharger docs / ROADMAP / README reflect shipped schedulers + benchmarks
+- Proprietary source-available license + commercial sale path unchanged
+
+### Honesty
+
+- Synthetic microbench speedups are **MEASURED** I/O-bound harness results — not wrangler/verify end-to-end claims
+- CU = resource accounting only — **not** cryptocurrency
+- Hosted multi-tenant Cloud remains **not shipped** as a public product
+- No fabricated Cloudflare endorsement or adoption metrics
 
 ## [Unreleased]
 
-### Documentation
-
-- Expanded Cloudflare-ready README (problem/solution, STABLE bindings, CI gate, deploy path, support-bundle, Supercharger, commercial/acquisition pointers)
-- Fixed GitHub hero/logo rendering via PNG exports (`docs/assets/hero.png`, `logo.png`); removed corrupt control character from `hero.svg`
-- Published measured Supercharger benchmarks in `docs/BENCHMARKS.md` (microbench + CU 5 vs 500 plan differentiation)
-- Corrected stale “Supercharger not shipped / no public benchmarks” claims across README, ROADMAP, SUPERCHARGER, ARCHITECTURE, site docs
+_(empty after 1.4.0 freeze)_
 
 ## [0.1.0] — 2026-09-19
 
@@ -30,7 +51,7 @@ Baseline package version in `package.json` / `@edgemirror/cli@0.1.0`. Two commit
 
 ### Added — Phase 1 parity engine + Phase 2 verify workflow (`043de9f`)
 
-- Publishable CLI workspace (`@edgemirror/cli`) with commands: `init`, `doctor`, `test`, `verify`/`v`, `preview`, `compat`, `bundle`, `deploy`
+- Publishable CLI workspace (`edgemirror`) with commands: `init`, `doctor`, `test`, `verify`/`v`, `preview`, `compat`, `bundle`, `deploy`
 - Local execution via `wrangler dev --local`
 - Remote / preview paths that report `REMOTE_NOT_CONFIGURED` when Cloudflare credentials are absent (never faked)
 - Trace schema (`ExecutionTrace` 1.0), normalizer, differential comparison, classifications
@@ -46,8 +67,9 @@ Baseline package version in `package.json` / `@edgemirror/cli@0.1.0`. Two commit
 
 ### Notes
 
-- Hosted Cloud, Supercharger scheduler/CU, and public explorer were **not** part of these commits.
-- Remote parity percentages require live Cloudflare credentials; absent credentials yield honest skip statuses.
+- Hosted Cloud was **not** part of the 0.1.0 cut
+- Remote parity percentages require live Cloudflare credentials; absent credentials yield honest skip statuses
 
-[Unreleased]: https://github.com/theworker02/EdgeMirror/compare/88dd111...HEAD
+[1.4.0]: https://github.com/theworker02/EdgeMirror/releases/tag/v1.4.0
 [0.1.0]: https://github.com/theworker02/EdgeMirror/tree/88dd111
+[Unreleased]: https://github.com/theworker02/EdgeMirror/compare/v1.4.0...HEAD

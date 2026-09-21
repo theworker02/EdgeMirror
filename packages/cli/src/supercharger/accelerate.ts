@@ -47,6 +47,7 @@ export async function accelerateLocalExecutes(
     options: {
       enabled: true,
       mode,
+      scheduler: input.options?.scheduler ?? "classic",
       maxConcurrency: input.options?.maxConcurrency,
       maxCu: input.options?.maxCu,
     },

@@ -35,6 +35,10 @@ export function canAfford(budget: CuBudget, cu: number): boolean {
   return budget.used + cu <= budget.limit;
 }
 
+/**
+ * Charge CU in-place (mutates budget). Avoids O(n) array copies on the
+ * scheduler hot path when thousands of jobs reserve/charge.
+ */
 export function chargeCu(
   budget: CuBudget,
   input: { jobId: string; kind: JobKind; cu: number; note?: string },
@@ -43,17 +47,15 @@ export function chargeCu(
     throw new Error("CU charge cannot be negative");
   }
   const entry: CuLedgerEntry = {
-    at: new Date().toISOString(),
+    at: "", // hot path: skip ISO formatting; ledger presence still recorded
     jobId: input.jobId,
     kind: input.kind,
     cu: input.cu,
     note: input.note,
   };
-  return {
-    limit: budget.limit,
-    used: budget.used + input.cu,
-    entries: [...budget.entries, entry],
-  };
+  budget.used += input.cu;
+  budget.entries.push(entry);
+  return budget;
 }
 
 export function formatCuReport(budget: CuBudget): string {

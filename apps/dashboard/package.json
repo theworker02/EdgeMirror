@@ -1,7 +1,7 @@
 {
   "name": "@edgemirror/dashboard",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "EdgeMirror dashboard visual shell — design-system consistency",
   "scripts": {
     "build": "node scripts/build.mjs",

@@ -6,6 +6,7 @@ import {
   JobDag,
   buildParityDag,
   runScheduler,
+  planTakeCount,
   createCuBudget,
   chargeCu,
   canAfford,
@@ -22,6 +23,7 @@ import {
   startRunner,
   compareBudgets,
   optimizeForBudget,
+  parseSchedulerKind,
 } from "./index.js";
 import { BUILTIN_CORPUS as CORPUS } from "../corpus/index.js";
 
@@ -61,14 +63,14 @@ describe("CU accounting", () => {
 describe("Governors + adaptive concurrency", () => {
   it("ECO is serial; MAX defaults high concurrency", () => {
     expect(resolveGovernor("ECO").maxConcurrency).toBe(1);
-    expect(resolveGovernor("MAX").maxConcurrency).toBe(16);
+    expect(resolveGovernor("MAX").maxConcurrency).toBe(128);
     const conc = recommendConcurrency({
       cpus: 8,
       freeMemMb: 8192,
       mode: "BALANCED",
     });
     expect(conc).toBeGreaterThanOrEqual(1);
-    expect(conc).toBeLessThanOrEqual(4);
+    expect(conc).toBeLessThanOrEqual(8);
   });
 
   it("allows CU overrides above governor baseline (Supercharger II)", () => {
@@ -84,6 +86,16 @@ describe("Governors + adaptive concurrency", () => {
       rateLimitRemaining: 2,
     });
     expect(conc).toBe(1);
+  });
+
+  it("MAX recommends aggressive fan-out on deep queues", () => {
+    const conc = recommendConcurrency({
+      cpus: 16,
+      freeMemMb: 32000,
+      mode: "MAX",
+      queueDepth: 500,
+    });
+    expect(conc).toBeGreaterThanOrEqual(32);
   });
 });
 
@@ -101,6 +113,16 @@ describe("Optimizer — CU budget selects different work", () => {
     expect(addedPackages.length).toBeGreaterThan(0);
     expect(depthIncreased || addedPackages.length > 0).toBe(true);
     expect(high.estimatedCu).toBeGreaterThan(low.estimatedCu);
+  });
+
+  it("CU 500 schedules at least 500 jobs when budget allows", () => {
+    const high = optimizeForBudget({
+      budgetCu: 500,
+      testIds,
+      includeRemote: false,
+    });
+    expect(high.jobs.length).toBeGreaterThanOrEqual(500);
+    expect(high.estimatedCu).toBeLessThanOrEqual(500);
   });
 
   it("scarce CU defers research/fuzz packages", () => {
@@ -140,6 +162,34 @@ describe("Scheduler", () => {
       true,
     );
     expect(seen.length).toBeLessThanOrEqual(3);
+  });
+
+  it("schedules ≥500 independent jobs under MAX", async () => {
+    const n = 500;
+    const specs = Array.from({ length: n }, (_, i) => ({
+      id: `bulk-${i}`,
+      kind: "custom" as const,
+      name: `B${i}`,
+      priority: 2 as const,
+      estimatedCu: 1,
+      dependsOn: [] as string[],
+    }));
+    const result = await runScheduler({
+      jobs: specs,
+      options: {
+        enabled: true,
+        mode: "MAX",
+        maxCu: n,
+        maxConcurrency: 64,
+      },
+      execute: async () => {
+        await new Promise((r) => setTimeout(r, 2));
+        return { cu: 1 };
+      },
+    });
+    const ok = result.jobs.filter((j) => j.status === "succeeded").length;
+    expect(ok).toBe(n);
+    expect(result.wallMs).toBeLessThan(n * 2); // must beat near-sequential
   });
 
   it("respects dependencies", async () => {
@@ -251,6 +301,90 @@ describe("Plan + microbench gates", () => {
     expect(bench.ratio.wallSpeedupMeasured).toBeGreaterThan(0);
     const gates = evaluatePerfGates(bench);
     expect(gates.passed).toBe(true);
+  });
+});
+
+describe("Double Trouble scheduler", () => {
+  it("parses classic and double-trouble aliases", () => {
+    expect(parseSchedulerKind("classic")).toBe("classic");
+    expect(parseSchedulerKind("default")).toBe("classic");
+    expect(parseSchedulerKind("double-trouble")).toBe("double-trouble");
+    expect(parseSchedulerKind("dt")).toBe("double-trouble");
+    expect(parseSchedulerKind("pairs")).toBe("double-trouble");
+    expect(() => parseSchedulerKind("nope")).toThrow(/Unknown scheduler/);
+  });
+
+  it("planTakeCount prefers even batches for double-trouble", () => {
+    expect(
+      planTakeCount({ scheduler: "classic", freeSlots: 5, running: 0 }),
+    ).toEqual({ take: 5, asPairs: false, allowSingleton: true });
+    expect(
+      planTakeCount({
+        scheduler: "double-trouble",
+        freeSlots: 5,
+        running: 2,
+      }),
+    ).toEqual({ take: 4, asPairs: true, allowSingleton: false });
+    expect(
+      planTakeCount({
+        scheduler: "double-trouble",
+        freeSlots: 1,
+        running: 2,
+      }),
+    ).toEqual({ take: 0, asPairs: true, allowSingleton: false });
+    expect(
+      planTakeCount({
+        scheduler: "double-trouble",
+        freeSlots: 1,
+        running: 0,
+      }),
+    ).toEqual({ take: 1, asPairs: false, allowSingleton: true });
+  });
+
+  it("runs independent jobs in pairs and records pairWaves", async () => {
+    const n = 7; // odd → expect singleton tail
+    const specs = Array.from({ length: n }, (_, i) => ({
+      id: `dt-${i}`,
+      kind: "custom" as const,
+      name: `DT${i}`,
+      priority: 2 as const,
+      estimatedCu: 1,
+      dependsOn: [] as string[],
+    }));
+    const result = await runScheduler({
+      jobs: specs,
+      options: {
+        enabled: true,
+        mode: "FAST",
+        scheduler: "double-trouble",
+        maxCu: n,
+        maxConcurrency: 4,
+      },
+      execute: async () => {
+        await new Promise((r) => setTimeout(r, 5));
+        return { cu: 1 };
+      },
+    });
+    expect(result.scheduler).toBe("double-trouble");
+    expect(result.jobs.filter((j) => j.status === "succeeded").length).toBe(n);
+    expect(result.pairWaves).toBeGreaterThanOrEqual(3);
+    expect(result.singletonTails).toBeGreaterThanOrEqual(1);
+    // Even concurrency under Double Trouble when >1
+    expect(result.governor.maxConcurrency % 2).toBe(0);
+  });
+
+  it("microbench supports double-trouble scheduler", async () => {
+    const bench = await runMicrobench({
+      jobs: 16,
+      sleepMs: 5,
+      mode: "FAST",
+      scheduler: "double-trouble",
+      maxConcurrency: 8,
+    });
+    expect(bench.workload.scheduler).toBe("double-trouble");
+    expect(bench.supercharger.scheduler).toBe("double-trouble");
+    expect(bench.supercharger.pairWaves).toBeGreaterThan(0);
+    expect(evaluatePerfGates(bench).passed).toBe(true);
   });
 });
 

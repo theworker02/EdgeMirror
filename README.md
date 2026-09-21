@@ -241,9 +241,11 @@ npx edgemirror pitch-demo
 
 ## Supercharger (shipped, optional)
 
-Optional performance layer: DAG scheduling, adaptive concurrency, content-addressed cache, incremental/`--fast` selection, and **Compute Unit (CU)** budgets.
+Optional performance layer: DAG scheduling, adaptive concurrency, content-addressed cache, incremental/`--fast` selection, **Compute Unit (CU)** budgets, and selectable schedulers.
 
 **Not required** for `edgemirror verify`. Opt in with `--supercharge` / `edgemirror supercharge …`.
+
+**Schedulers (either/or):** `classic` (default adaptive fan-out) · `double-trouble` (pair-wise / dyadic — groups of two).
 
 **Compute Units (CU) are accounting meters — not cryptocurrency, tokens, or tradable assets.**
 
@@ -251,17 +253,21 @@ Optional performance layer: DAG scheduling, adaptive concurrency, content-addres
 edgemirror supercharge doctor
 edgemirror supercharge plan --cu 5
 edgemirror supercharge plan --cu 500
-edgemirror supercharge bench --jobs 24 --sleep-ms 15 --mode FAST
-edgemirror verify --supercharge
+edgemirror supercharge bench --jobs 500 --sleep-ms 8 --mode MAX --scheduler classic
+edgemirror supercharge bench --jobs 500 --sleep-ms 8 --mode MAX --scheduler double-trouble
+edgemirror verify --supercharge --scheduler double-trouble
 edgemirror compat --supercharge
+edgemirror badge
+edgemirror reproduce EM-001
+edgemirror emf EM-001
 ```
 
-CU budget changes **which work packages are selected** (deterministic optimizer). Example (builtin corpus, BALANCED mode, measured on this repo’s planner):
+CU budget changes **which work packages are selected** (deterministic optimizer). High budgets also expand independent fan-out units (scheduler capacity **≥500** jobs). Example package selection (builtin corpus, BALANCED mode):
 
-| Budget | Depth | Selected packages | Jobs | Est. CU |
-|--------|-------|-------------------|------|---------|
+| Budget | Depth | Selected packages | Base jobs (pre–fan-out) | Est. CU |
+|--------|-------|-------------------|-------------------------|---------|
 | **5 CU** | 2 | `required_parity`, `extended_parity` | 5 | 5 |
-| **500 CU** | 4 | all packages incl. compat / historical / fuzz / research | 14 | 273 |
+| **500 CU** | 4 | all packages incl. compat / historical / fuzz / research | ≥500 with fan-out | ≤500 |
 
 Wall-time ranges printed by `plan` are **ESTIMATES** (heuristic). Scheduler wall times from `supercharge bench` are **MEASURED**. Details: [docs/SUPERCHARGER.md](./docs/SUPERCHARGER.md) · [docs/BENCHMARKS.md](./docs/BENCHMARKS.md)
 
@@ -271,7 +277,18 @@ Wall-time ranges printed by `plan` are **ESTIMATES** (heuristic). Scheduler wall
 
 Public numbers below come from the shipped harness. They are **not** marketing claims about wrangler/workerd verify wall time.
 
-### MEASURED — synthetic microbench (2026-09-21)
+### MEASURED — 500-job fan-out (v1.4.0)
+
+Host: Windows / Node v24.16.0 / 32 CPUs · workload: **500** jobs × **8 ms** · mode `MAX` · concurrency 128
+
+| Scheduler | Sequential (ms) | Supercharger (ms) | Ratio | Notes |
+|-----------|-----------------|-------------------|-------|-------|
+| **classic** | **7783** | **63** | **123.5×** | adaptive fan-out |
+| **double-trouble** | **7791** | **62** | **125.7×** | 250 pair waves |
+
+Gates: **PASS**. Artifacts: [`benchmarks/microbench-500-classic-1789957641937.json`](./benchmarks/microbench-500-classic-1789957641937.json) · [`benchmarks/microbench-500-double-trouble-1789957649891.json`](./benchmarks/microbench-500-double-trouble-1789957649891.json)
+
+### MEASURED — smaller prior run
 
 Host: Windows / Node v24.16.0 / 32 CPUs · workload: 24 jobs × 15 ms sleep · mode `FAST`
 
@@ -361,10 +378,10 @@ npm test
 
 # Pack without publishing (proves installability)
 npm run pack:cli
-# → edgemirror-0.1.0.tgz
+# → edgemirror-1.4.0.tgz
 
 # In a Worker project (tarball today; npmjs.com when published)
-npm install -D ./edgemirror-0.1.0.tgz
+npm install -D ./edgemirror-1.4.0.tgz
 npx edgemirror init
 npx edgemirror verify
 ```

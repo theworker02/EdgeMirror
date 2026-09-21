@@ -51,8 +51,9 @@ export function recommendConcurrency(input: {
 }): number {
   const { cpus, freeMemMb, mode } = input;
 
-  // Memory floor: leave headroom for wrangler/workerd (~512MB soft).
-  const memSlots = Math.max(1, Math.floor(freeMemMb / 512));
+  // Memory floor: leave headroom for wrangler/workerd (~256MB soft for I/O fan-out).
+  // Synthetic / lightweight jobs need far less than 512MB each.
+  const memSlots = Math.max(1, Math.floor(freeMemMb / 256));
 
   let base: number;
   switch (mode) {
@@ -60,17 +61,18 @@ export function recommendConcurrency(input: {
       base = 1;
       break;
     case "BALANCED":
-      base = Math.max(1, Math.min(4, Math.ceil(cpus / 4)));
-      break;
-    case "FAST":
       base = Math.max(2, Math.min(8, Math.ceil(cpus / 2)));
       break;
+    case "FAST":
+      base = Math.max(4, Math.min(32, cpus * 2));
+      break;
     case "MAX":
-      base = Math.max(2, Math.min(16, cpus));
+      // I/O-bound fan-out: allow well above CPU count (timer/network bound).
+      base = Math.max(8, Math.min(128, Math.max(cpus * 4, 64)));
       break;
   }
 
-  let conc = Math.min(base, memSlots, cpus);
+  let conc = Math.min(base, memSlots);
 
   // High load → back off
   if (input.loadAvg1m !== undefined && input.loadAvg1m > cpus * 0.85) {
@@ -85,9 +87,11 @@ export function recommendConcurrency(input: {
     conc = 1;
   }
 
-  // Deep queue under ECO stays serial; under FAST/MAX can rise toward base
+  // Deep queues: raise toward mode base (large microbenches / matrices)
   if (input.queueDepth !== undefined && input.queueDepth > 50 && mode !== "ECO") {
-    conc = Math.min(conc + 1, base, memSlots);
+    const boost =
+      input.queueDepth >= 500 ? Math.min(base, conc + Math.ceil(base / 2)) : conc + 2;
+    conc = Math.min(boost, base, memSlots);
   }
 
   return Math.max(1, conc);

@@ -1,6 +1,6 @@
 {
   "name": "@edgemirror/vitest",
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "Thin Vitest reporter/adapter for EdgeMirror — does not replace Vitest",
   "type": "module",
   "main": "./dist/index.js",

@@ -1,25 +1,46 @@
 /**
  * Job DAG — schedulable EdgeMirror operations.
+ *
+ * Hot-path notes (large fan-out):
+ * - Independent jobs (no deps) are enqueued once and drained without rescanning.
+ * - Ready set is maintained incrementally; avoid O(n) all()+sort each tick.
  */
 
 import type { JobSpec, JobState, JobStatus } from "./types.js";
 
 export class JobDag {
   private readonly jobs = new Map<string, JobState>();
+  /** Dependents index: depId → job ids that list it in dependsOn */
+  private readonly dependents = new Map<string, string[]>();
+  /** Jobs ready to run (deps satisfied), ordered by priority then insert order */
+  private readonly readyQueue: JobState[] = [];
+  private readyDirty = false;
+  private pendingCount = 0;
+  private readyCount = 0;
+  private runningCount = 0;
 
   add(spec: JobSpec): void {
     if (this.jobs.has(spec.id)) {
       throw new Error(`Duplicate job id: ${spec.id}`);
     }
+    const state: JobState = { ...spec, status: "pending" };
+    this.jobs.set(spec.id, state);
+    this.pendingCount += 1;
     for (const dep of spec.dependsOn) {
-      if (!this.jobs.has(dep) && dep !== spec.id) {
-        // Allow forward refs only if already present; otherwise require deps first
-      }
+      const list = this.dependents.get(dep);
+      if (list) list.push(spec.id);
+      else this.dependents.set(dep, [spec.id]);
     }
-    this.jobs.set(spec.id, { ...spec, status: "pending" });
   }
 
   addMany(specs: JobSpec[]): void {
+    // Fast path: all independent — O(n) insert, no topological search.
+    if (specs.every((s) => s.dependsOn.length === 0)) {
+      for (const s of specs) this.add(s);
+      this.seedReadyQueue();
+      return;
+    }
+
     // Insert in dependency-friendly order when possible
     const remaining = [...specs];
     const added = new Set<string>();
@@ -29,7 +50,6 @@ export class JobDag {
         s.dependsOn.every((d) => added.has(d) || this.jobs.has(d)),
       );
       if (idx < 0) {
-        // Cycle or missing dep — add rest and let validate catch
         for (const s of remaining) this.add(s);
         remaining.length = 0;
         break;
@@ -38,6 +58,7 @@ export class JobDag {
       this.add(spec!);
       added.add(spec!.id);
     }
+    this.seedReadyQueue();
   }
 
   get(id: string): JobState | undefined {
@@ -46,6 +67,10 @@ export class JobDag {
 
   all(): JobState[] {
     return [...this.jobs.values()];
+  }
+
+  size(): number {
+    return this.jobs.size;
   }
 
   validate(): { ok: true } | { ok: false; errors: string[] } {
@@ -57,7 +82,6 @@ export class JobDag {
         }
       }
     }
-    // Cycle detection (DFS)
     const visiting = new Set<string>();
     const visited = new Set<string>();
     const visit = (id: string): boolean => {
@@ -80,47 +104,132 @@ export class JobDag {
     return errors.length ? { ok: false, errors } : { ok: true };
   }
 
-  /** Jobs whose deps have succeeded (or been skipped as satisfied). */
+  /** Ensure jobs with satisfied deps are in the ready queue. */
+  private seedReadyQueue(): void {
+    for (const job of this.jobs.values()) {
+      if (job.status === "pending" && this.depsSatisfied(job)) {
+        this.markReady(job);
+      }
+    }
+    this.sortReadyQueue();
+  }
+
+  private depsSatisfied(job: JobState): boolean {
+    for (const d of job.dependsOn) {
+      const dep = this.jobs.get(d);
+      if (!dep || (dep.status !== "succeeded" && dep.status !== "skipped")) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private markReady(job: JobState): void {
+    if (job.status !== "pending") return;
+    job.status = "ready";
+    this.pendingCount -= 1;
+    this.readyCount += 1;
+    this.readyQueue.push(job);
+    this.readyDirty = true;
+  }
+
+  private sortReadyQueue(): void {
+    if (!this.readyDirty) return;
+    this.readyQueue.sort(
+      (a, b) => a.priority - b.priority || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    );
+    this.readyDirty = false;
+  }
+
+  /**
+   * Pop up to `limit` ready jobs (highest priority first).
+   * Prefer this over readyJobs() on the hot path.
+   * Callers that do not start a popped job must `returnReady` it.
+   */
+  takeReady(limit: number): JobState[] {
+    if (limit <= 0) return [];
+    if (this.readyQueue.length === 0 && this.pendingCount > 0) {
+      this.seedReadyQueue();
+    }
+    if (this.readyQueue.length === 0) return [];
+    this.sortReadyQueue();
+    const out: JobState[] = [];
+    while (out.length < limit && this.readyQueue.length > 0) {
+      const job = this.readyQueue.shift()!;
+      if (job.status !== "ready") continue;
+      out.push(job);
+    }
+    return out;
+  }
+
+  /** Return a ready job that was taken but not started. */
+  returnReady(job: JobState): void {
+    if (job.status !== "ready") return;
+    this.readyQueue.push(job);
+    this.readyDirty = true;
+  }
+
+  /** @deprecated Prefer takeReady for scheduling; kept for tests/diagnostics. */
   readyJobs(): JobState[] {
-    return this.all()
-      .filter((j) => j.status === "pending" || j.status === "ready")
-      .filter((j) =>
-        j.dependsOn.every((d) => {
-          const dep = this.jobs.get(d);
-          return dep && (dep.status === "succeeded" || dep.status === "skipped");
-        }),
-      )
-      .map((j) => {
-        if (j.status === "pending") j.status = "ready";
-        return j;
-      })
-      .sort((a, b) => a.priority - b.priority || a.id.localeCompare(b.id));
+    this.seedReadyQueue();
+    this.sortReadyQueue();
+    return this.readyQueue.filter((j) => j.status === "ready").slice();
   }
 
   setStatus(id: string, status: JobStatus, patch?: Partial<JobState>): void {
     const job = this.jobs.get(id);
     if (!job) throw new Error(`Unknown job ${id}`);
-    Object.assign(job, patch, { status });
+    const prev = job.status;
+    if (patch) Object.assign(job, patch);
+    job.status = status;
+
+    if (prev === "pending") this.pendingCount -= 1;
+    else if (prev === "ready") {
+      this.readyCount -= 1;
+      if (status !== "ready") {
+        const idx = this.readyQueue.indexOf(job);
+        if (idx >= 0) this.readyQueue.splice(idx, 1);
+      }
+    } else if (prev === "running") this.runningCount -= 1;
+
+    if (status === "pending") this.pendingCount += 1;
+    else if (status === "ready") {
+      this.readyCount += 1;
+      if (prev !== "ready") {
+        this.readyQueue.push(job);
+        this.readyDirty = true;
+      }
+    } else if (status === "running") this.runningCount += 1;
+
+    // When a job succeeds/skips, unlock dependents without full DAG scan.
+    if (status === "succeeded" || status === "skipped") {
+      const kids = this.dependents.get(id);
+      if (kids) {
+        for (const kidId of kids) {
+          const kid = this.jobs.get(kidId);
+          if (kid && kid.status === "pending" && this.depsSatisfied(kid)) {
+            this.markReady(kid);
+          }
+        }
+      }
+    }
   }
 
   hasPending(): boolean {
-    return this.all().some(
-      (j) =>
-        j.status === "pending" ||
-        j.status === "ready" ||
-        j.status === "running",
-    );
+    return this.pendingCount + this.readyCount + this.runningCount > 0;
   }
 
   failDependents(failedId: string): void {
-    for (const job of this.jobs.values()) {
-      if (
-        (job.status === "pending" || job.status === "ready") &&
-        job.dependsOn.includes(failedId)
-      ) {
-        job.status = "skipped";
-        job.error = `Skipped because dependency ${failedId} failed`;
-        this.failDependents(job.id);
+    const kids = this.dependents.get(failedId);
+    if (!kids) return;
+    for (const kidId of kids) {
+      const job = this.jobs.get(kidId);
+      if (!job) continue;
+      if (job.status === "pending" || job.status === "ready") {
+        this.setStatus(kidId, "skipped", {
+          error: `Skipped because dependency ${failedId} failed`,
+        });
+        this.failDependents(kidId);
       }
     }
   }
@@ -166,10 +275,8 @@ export function buildParityDag(input: {
   }
 
   for (const testId of input.testIds) {
-    // Time-to-confidence: root/health first
-    const priority = input.timeToConfidence === false
-      ? 2
-      : priorityForTest(testId);
+    const priority =
+      input.timeToConfidence === false ? 2 : priorityForTest(testId);
 
     specs.push({
       id: `local:${testId}`,

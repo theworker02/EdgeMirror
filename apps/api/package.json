@@ -1,6 +1,6 @@
 {
   "name": "@edgemirror/api",
-  "version": "0.1.0",
+  "version": "1.4.0",
   "description": "EdgeMirror Cloud control-plane API — billing webhooks + entitlements",
   "type": "module",
   "main": "./dist/index.js",
