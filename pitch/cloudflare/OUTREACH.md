@@ -63,7 +63,7 @@ https://github.com/theworker02
 
 | Date (UTC) | Channel | Action | Result |
 |------------|---------|--------|--------|
-| 2026-09-21 | Email `partners@cloudflare.com` | Professional diligence / partnership+acquisition interest email | See log note below |
-| 2026-09-21 | Partner signup form | Documented; user may need company-domain email to complete | Manual if portal blocks consumer email |
+| 2026-09-21 | Gmail draft → `partners@cloudflare.com` | Ready-to-send diligence / partnership+acquisition interest email created in authenticated Gmail | **Draft only** — user must review and Send |
+| 2026-09-21 | Partner Network signup form | Documented at https://www.partners.cloudflare.com/partners/s/signup | **Manual** — portal often requires company-domain email |
 
-*(Log rows are updated when send/form actions complete in the same change set.)*
+**User next steps:** (1) Open Gmail Drafts, review the EdgeMirror message to `partners@cloudflare.com`, send once. (2) Optionally submit the Partner Network form with the same short pitch if you have a company email. Do not re-send to other Cloudflare addresses unless they reply with a better inbox.
