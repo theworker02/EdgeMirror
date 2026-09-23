@@ -1,4 +1,4 @@
-﻿# Agent 2 Status — Cloudflare / Live Demo
+# Agent 2 Status — Cloudflare / Live Demo
 
 Updated: 2026-09-19T21:25:00-04:00
 
