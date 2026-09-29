@@ -478,3 +478,16 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md). Evaluation and contribution under the 
 **Source-available proprietary** — evaluation under [LICENSE](./LICENSE); commercial / production use via [COMMERCIAL.md](./COMMERCIAL.md). See also [NOTICE](./NOTICE) and the [License Transition & Enforcement Notice](./LICENSE_TRANSITION_NOTICE.md) (historical Apache-2.0 vs current proprietary; enforcement by copyright holder and/or acquirer).
 
 Contact: [@theworker02](https://github.com/theworker02)
+
+## Badges & release notes
+
+| Badge | Meaning |
+| --- | --- |
+| docs live | Public documentation / Pages surface for `EdgeMirror` |
+| release v1.0.0 | Stable tagged release with narrative notes |
+| license | See repository `LICENSE` for terms |
+| status maintained | Actively kept in the @theworker02 portfolio |
+| version 1.0.0 | Documentation and brand completeness milestone |
+| pages enabled | Site intended at `https://theworker02.github.io/EdgeMirror/` |
+
+Detailed narrative for the stable line lives in [CHANGELOG.md](./CHANGELOG.md) and the [v1.0.0 GitHub Release](https://github.com/theworker02/EdgeMirror/releases/tag/v1.0.0).
