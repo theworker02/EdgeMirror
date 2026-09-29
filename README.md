@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.svg" alt="EdgeMirror official logo" width="128" height="128">
+</p>
+
 # EdgeMirror
 
 <p align="center">
